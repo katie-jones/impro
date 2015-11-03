@@ -32,7 +32,6 @@ public class MainActivity extends Activity {
 	
 	private final static String TAG = "SimpleCamera";
 	private TextureView mTextureView = null;
-    private boolean x = false;
 	private TextureView.SurfaceTextureListener mSurfaceTextureListner = new TextureView.SurfaceTextureListener() {
 		
 		@Override
@@ -201,7 +200,7 @@ public class MainActivity extends Activity {
         }
     };
 
-
+    private boolean x = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -227,12 +226,14 @@ public class MainActivity extends Activity {
                 mPreviewBuilder.addTarget(surface);
 
                 try {
-                    mCameraDevice.createCaptureSession(Arrays.asList(surface), mPreviewStateCallback2, null);
+					if (x)
+                    	mCameraDevice.createCaptureSession(Arrays.asList(surface), mPreviewStateCallback2, null);
+					else
+						mCameraDevice.createCaptureSession(Arrays.asList(surface), mPreviewStateCallback, null);
+					x = !x;
                 } catch (CameraAccessException e) {
                     e.printStackTrace();
                 }
-
-//                x = !x;
             }
         });
 	}
