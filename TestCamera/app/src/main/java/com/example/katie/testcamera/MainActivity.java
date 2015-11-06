@@ -110,7 +110,7 @@ public class MainActivity extends Activity {
 			
 			mPreviewBuilder.addTarget(surface);
 			
-			try {
+			try { // Start camera with stream (mPreviewStateCallback)
 				mCameraDevice.createCaptureSession(Arrays.asList(surface), mPreviewStateCallback, null);
 			} catch (CameraAccessException e) {
 				e.printStackTrace();
@@ -138,24 +138,20 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated method stub
 			Log.i(TAG, "onConfigured");
 			mPreviewSession = session;
-			
+
+			/*TODO: We create a new handler everytime we call this function
+			/ but I think we should do it only once.*/
 			mPreviewBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-			
+
 			HandlerThread backgroundThread = new HandlerThread("CameraPreview");
 			backgroundThread.start();
 			Handler backgroundHandler = new Handler(backgroundThread.getLooper());
 			
 			try {
-//                if (x)
-
 				mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, backgroundHandler);
-//                else
-//                    mPreviewSession.stopRepeating();
-				//mPreviewSession.capture(mPreviewBuilder.build(),null,backgroundHandler);
 			} catch (CameraAccessException e) {
 				e.printStackTrace();
 			}
-			
 		}
 		
 		@Override
@@ -164,33 +160,19 @@ public class MainActivity extends Activity {
 			Log.e(TAG, "CameraCaptureSession Configure failed");
 		}
 	};
-
-    private Button mCaptureButton;
-    private CameraCaptureSession.StateCallback mPreviewStateCallback2 = new CameraCaptureSession.StateCallback() {
+	private CameraCaptureSession.StateCallback mPreviewStateCallback2 = new CameraCaptureSession.StateCallback() {
 
         @Override
         public void onConfigured(CameraCaptureSession session) {
-            // TODO Auto-generated method stub
+			// TODO Auto-generated method stub
             Log.i(TAG, "onConfigured");
             mPreviewSession = session;
 
-            mPreviewBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-
-            HandlerThread backgroundThread = new HandlerThread("CameraPreview");
-            backgroundThread.start();
-            Handler backgroundHandler = new Handler(backgroundThread.getLooper());
-
             try {
-//                if (x)
-
                 mPreviewSession.stopRepeating();
-//                else
-//                    mPreviewSession.stopRepeating();
-                //mPreviewSession.capture(mPreviewBuilder.build(),null,backgroundHandler);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
-
         }
 
         @Override
@@ -200,7 +182,8 @@ public class MainActivity extends Activity {
         }
     };
 
-    private boolean x = false;
+	private Button mCaptureButton;
+	private boolean x = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
