@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
 	
 	private final static String TAG = "SimpleCamera";
 	private TextureView mTextureView = null;
-	private TextureView.SurfaceTextureListener mSurfaceTextureListner = new TextureView.SurfaceTextureListener() {
+	private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
 		
 		@Override
 		public void onSurfaceTextureUpdated(SurfaceTexture surface) {
@@ -194,7 +194,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		mTextureView = (TextureView) findViewById(R.id.textureView1);
-		mTextureView.setSurfaceTextureListener(mSurfaceTextureListner);
+		mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
 
         mCaptureButton = (Button) findViewById(R.id.capture);
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
