@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
 				CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 				StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 				mPreviewSize = map.getOutputSizes(SurfaceTexture.class)[0];
-				
+
 				manager.openCamera(cameraId, mStateCallback, null);
 			}
 			catch(CameraAccessException e)
