@@ -4,11 +4,8 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textview1"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="@string/frag1"
-        android:background="#ff0000"
-        />
+        android:text="@string/frag2" />
 
 </LinearLayout>
