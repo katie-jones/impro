@@ -2,6 +2,7 @@ package com.example.katie.epiccamera;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -23,6 +24,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -31,13 +33,14 @@ import java.util.Arrays;
 /**
  * Created by katie on 2015-11-08.
  */
-public class LiveCameraFragment extends Fragment {
+public class LiveCameraFragment extends Fragment implements View.OnClickListener {
 
     private final static String TAG = "SimpleCamera";
 
     private View mView; // View corresponding to fragment -- inflated xml file
     private TextureView mTextureView = null; // Texture view to hold texture with camera images
     private Activity parent; // parent activity
+    private Button mButton;
 
 
     @Override
@@ -47,6 +50,9 @@ public class LiveCameraFragment extends Fragment {
         mView = inflater.inflate(R.layout.live_camera, container, false);
         mTextureView = (TextureView) mView.findViewById(R.id.camera_texture);
         mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+
+        mButton = (Button) mView.findViewById(R.id.button);
+        mButton.setOnClickListener(this);
         return mView;
     }
 
@@ -56,13 +62,35 @@ public class LiveCameraFragment extends Fragment {
 
     }
 
-   
+
 
     @Override
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         parent = getActivity();
 
+    }
+
+
+
+    @Override
+    public void onClick(View v) {
+        if (mCameraDevice != null)
+        {
+            mCameraDevice.close();
+            mCameraDevice = null;
+        }
+
+
+        Fragment newFragment = new PhotoFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.livecamera,newFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
+//        throw new RuntimeException("Yeah bitchhhheeesssss!");
+//        Log.e("a","sup");
     }
 
 
@@ -212,6 +240,11 @@ public class LiveCameraFragment extends Fragment {
 
         if (mCameraDevice != null)
         {
+            try {
+                mPreviewSession.stopRepeating();
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
             mCameraDevice.close();
             mCameraDevice = null;
         }
