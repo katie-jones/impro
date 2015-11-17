@@ -3,7 +3,9 @@ package com.example.kiki.Camera;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
@@ -14,10 +16,19 @@ import android.widget.Button;
  * Created by kiki on 10.11.15.
  */
 public class MainFragment extends Fragment implements View.OnClickListener {
+    private final static String TAG = "MainFrag";
+
     private View mView; // View corresponding to fragment -- inflated xml file
+    private Button mButton;
     private Fragment mStillFragment;
     private Fragment mLiveFragment;
-    private Button mButton;
+
+    private MainInterface mMainInterface;
+
+    public interface MainInterface {
+        public void onButtonClicked(View v);
+        public void onFragmentCreated();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,41 +44,42 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLiveFragment = new LiveFragment();
-        mStillFragment = new StillFragment();
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.cameraview, mStillFragment);
-        transaction.commit();
+        mMainInterface.onFragmentCreated();
+    }
 
+
+    @Override
+    public void onClick(View v) {
+        mMainInterface.onButtonClicked(v);
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        myOnAttach(getActivity());
 
     }
 
+
     @Override
-    public void onClick(View v){
-//        LiveFragment test = (LiveFragment)
-//                getChildFragmentManager().findFragmentByTag("livefragment");
-        // Exchange current fragment with the other one.
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        if (mLiveFragment.isVisible()){
-            mStillFragment = new StillFragment();
-            transaction.replace(mLiveFragment.getId(), mStillFragment);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        myOnAttach(activity);
+
+    }
+
+
+    public void myOnAttach(Activity activity) {
+        // Make sure the interface ClickCallback is defined in MainActivity
+        try {
+            mMainInterface = (MainInterface) activity;
         }
-        else {
-            mLiveFragment = new LiveFragment();
-            transaction.replace(mStillFragment.getId(), mLiveFragment);
+        catch (Exception e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement MainInterface");
         }
-
-//        if (test == null) {
-//            mLiveFragment = new LiveFragment();
-//            transaction.replace(mStillFragment.getId(), mLiveFragment);
-//        }
-//        else {
-//            mStillFragment = new StillFragment();
-//            transaction.replace(mLiveFragment.getId(), mStillFragment);
-//        }
-        transaction.commit();
-
-
     }
 
 //    @Override
