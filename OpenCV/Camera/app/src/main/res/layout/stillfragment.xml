@@ -7,9 +7,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stillfragment"/>
-    <TextureView
-        android:id="@+id/still_texture"
+
+    <com.example.kiki.Camera.AutoFitTextureView
+        android:id="@+id/stilltexture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
 </LinearLayout>
