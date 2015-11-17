@@ -1,10 +1,12 @@
 <resources>
-    <string name="app_name">OpenCVExample</string>
+    <string name="app_name">Kool Kamera</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="main">MainFragment</string>
     <string name="menu">MenuFragment</string>
+    <string name="stillfragment">StillFragment</string>
+    <string name="livefragment">LiveFragment</string>
     <string name="mainact">MainActivity</string>
 
 </resources>
