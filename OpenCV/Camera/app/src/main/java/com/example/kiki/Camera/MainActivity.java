@@ -32,8 +32,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
 
     public void onButtonClicked(View v) {
-        //        LiveFragment test = (LiveFragment)
-//                getChildFragmentManager().findFragmentByTag("livefragment");
+
         // Exchange current fragment with the other one.
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         if (mLiveFragment.isVisible()){
@@ -45,14 +44,6 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             transaction.replace(mStillFragment.getId(), mLiveFragment);
         }
 
-//        if (test == null) {
-//            mLiveFragment = new LiveFragment();
-//            transaction.replace(mStillFragment.getId(), mLiveFragment);
-//        }
-//        else {
-//            mStillFragment = new StillFragment();
-//            transaction.replace(mLiveFragment.getId(), mStillFragment);
-//        }
         transaction.commit();
     }
 
