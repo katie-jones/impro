@@ -11,6 +11,7 @@ import android.view.ViewGroup;
  */
 public class LiveFragment extends Fragment {
     private View mView; // View corresponding to fragment -- inflated xml file
+    private final static String TAG = "livefragment";
 
 
     @Override
@@ -21,6 +22,8 @@ public class LiveFragment extends Fragment {
 
         return mView;
     }
+
+
 
 
 //    @Override

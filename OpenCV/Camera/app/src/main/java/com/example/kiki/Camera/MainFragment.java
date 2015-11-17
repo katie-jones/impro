@@ -13,9 +13,11 @@ import android.widget.Button;
 /**
  * Created by kiki on 10.11.15.
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements View.OnClickListener {
     private View mView; // View corresponding to fragment -- inflated xml file
-
+    private Fragment mStillFragment;
+    private Fragment mLiveFragment;
+    private Button mButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -23,16 +25,46 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.mainfragment, container, false);
 
+        mButton = (Button) mView.findViewById(R.id.button);
+        mButton.setOnClickListener(this);
         return mView;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Fragment stillFragment = new StillFragment();
+        mLiveFragment = new LiveFragment();
+        mStillFragment = new StillFragment();
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.cameraview, stillFragment);
+        transaction.replace(R.id.cameraview, mStillFragment);
+        transaction.commit();
+
+
+    }
+
+    @Override
+    public void onClick(View v){
+//        LiveFragment test = (LiveFragment)
+//                getChildFragmentManager().findFragmentByTag("livefragment");
+        // Exchange current fragment with the other one.
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        if (mLiveFragment.isVisible()){
+            mStillFragment = new StillFragment();
+            transaction.replace(mLiveFragment.getId(), mStillFragment);
+        }
+        else {
+            mLiveFragment = new LiveFragment();
+            transaction.replace(mStillFragment.getId(), mLiveFragment);
+        }
+
+//        if (test == null) {
+//            mLiveFragment = new LiveFragment();
+//            transaction.replace(mStillFragment.getId(), mLiveFragment);
+//        }
+//        else {
+//            mStillFragment = new StillFragment();
+//            transaction.replace(mLiveFragment.getId(), mStillFragment);
+//        }
         transaction.commit();
 
 
