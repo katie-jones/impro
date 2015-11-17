@@ -36,11 +36,9 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         // Exchange current fragment with the other one.
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         if (mLiveFragment.isVisible()){
-            mStillFragment = new StillFragment();
             transaction.replace(mLiveFragment.getId(), mStillFragment);
         }
         else {
-            mLiveFragment = new LiveFragment();
             transaction.replace(mStillFragment.getId(), mLiveFragment);
         }
 

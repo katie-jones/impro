@@ -8,5 +8,7 @@
     <string name="stillfragment">StillFragment</string>
     <string name="livefragment">LiveFragment</string>
     <string name="mainact">MainActivity</string>
+    <string name="request_permission">Permission</string>
+    <string name="camera_error">Camera error</string>
 
 </resources>
