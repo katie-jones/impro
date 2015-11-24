@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -830,6 +832,48 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                     }
                 }
             }
+        }
+
+    }
+
+
+
+
+    private static class BitmapMaker implements Runnable {
+
+        /**
+         * The JPEG image
+         */
+        private final Image mImage;
+
+
+        public BitmapMaker(Image image) {
+            mImage = image;
+        }
+
+        @Override
+        public void run() {
+            try {
+                // Get buffer of JPEG image data from mImage
+                ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
+
+                // turn buffer into array
+                byte[] bytes = new byte[buffer.remaining()];
+                buffer.get(bytes);
+
+                // generate bitmap from byte array, and give option to make bitmap mutable (editable)
+                BitmapFactory mFactory = new BitmapFactory();
+                BitmapFactory.Options mOptions = new BitmapFactory.Options();
+                mOptions.inMutable = true;
+                Bitmap mBitmap = mFactory.decodeByteArray(bytes, 0, bytes.length, mOptions);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                mImage.close();
+            }
+
         }
 
     }
