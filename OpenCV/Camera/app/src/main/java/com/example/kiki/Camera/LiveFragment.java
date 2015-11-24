@@ -232,7 +232,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            mBackgroundHandler.post(new BitmapMaker(reader.acquireNextImage()));
         }
 
     };
