@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 /**
  * Created by kiki on 10.11.15.
@@ -29,6 +30,13 @@ public class StillFragment extends Fragment {
     public void putBitmap(Bitmap bm)
     {
         mBitmap = bm;
+        setImage();
+    }
+
+    private void setImage() {
+        ImageView imageView = (ImageView) getActivity().findViewById(R.id.stillimageview);
+        imageView.setImageBitmap(mBitmap);
+
     }
 
 

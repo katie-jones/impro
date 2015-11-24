@@ -8,8 +8,8 @@
         android:layout_height="wrap_content"
         android:text="@string/stillfragment"/>
 
-    <com.example.kiki.Camera.AutoFitTextureView
-        android:id="@+id/stilltexture"
+    <ImageView
+        android:id="@+id/stillimageview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
