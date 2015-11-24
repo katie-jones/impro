@@ -3,6 +3,7 @@ package com.example.kiki.Camera;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +19,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
-public class MainActivity extends Activity implements MainFragment.MainInterface {
+public class MainActivity extends Activity implements MainFragment.MainInterface, LiveFragment.LiveFragmentInterface {
     private Fragment mStillFragment;
     private Fragment mLiveFragment;
 
@@ -51,5 +52,12 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.cameraview, mStillFragment);
         transaction.commit();
+    }
+
+
+
+    public void sendBitmap(Bitmap bitmap) {
+        StillFragment frag = (StillFragment)mStillFragment;
+        frag.putBitmap(bitmap);
     }
 }

@@ -66,6 +66,40 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     private final static String TAG = "livefragment";
     private final int mImageWidth = 600;
 
+    private LiveFragmentInterface mInterface;
+
+    public interface LiveFragmentInterface {
+        public void sendBitmap(Bitmap bitmap);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        myOnAttach(getActivity());
+
+    }
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        myOnAttach(activity);
+
+    }
+
+
+    public void myOnAttach(Activity activity) {
+        // Make sure the interface ClickCallback is defined in MainActivity
+        try {
+            mInterface = (LiveFragmentInterface) activity;
+        }
+        catch (Exception e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement LiveFragmentInterface");
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -839,7 +873,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
 
 
-    private static class BitmapMaker implements Runnable {
+    private class BitmapMaker implements Runnable {
 
         /**
          * The JPEG image
@@ -866,6 +900,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 BitmapFactory.Options mOptions = new BitmapFactory.Options();
                 mOptions.inMutable = true;
                 Bitmap mBitmap = mFactory.decodeByteArray(bytes, 0, bytes.length, mOptions);
+                mInterface.sendBitmap(mBitmap);
             }
             catch (Exception e) {
                 e.printStackTrace();
