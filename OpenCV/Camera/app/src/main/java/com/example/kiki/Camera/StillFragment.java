@@ -2,6 +2,7 @@ package com.example.kiki.Camera;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,8 @@ import android.view.ViewGroup;
  */
 public class StillFragment extends Fragment {
     private View mView; // View corresponding to fragment -- inflated xml file
+    private Bitmap mBitmap;
+
 
 
     @Override
@@ -21,6 +24,11 @@ public class StillFragment extends Fragment {
         mView = inflater.inflate(R.layout.stillfragment, container, false);
 
         return mView;
+    }
+
+    public void putBitmap(Bitmap bm)
+    {
+        mBitmap = bm;
     }
 
 
