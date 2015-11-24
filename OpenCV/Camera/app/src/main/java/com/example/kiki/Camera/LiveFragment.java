@@ -62,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
     private View mView; // View corresponding to fragment -- inflated xml file
     private final static String TAG = "livefragment";
+    private final int mImageWidth = 600;
 
 
     @Override
@@ -463,10 +464,21 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 }
 
                 // For still image captures, we use the largest available size.
-                Size largest = Collections.max(
-                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-                        new CompareSizesByArea());
-                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
+//                Size largest = Collections.max(
+//                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+//                        new CompareSizesByArea());
+
+                //
+                Size[] ourSizes = map.getOutputSizes(ImageFormat.JPEG);
+                Size imageSize = ourSizes[0];
+                int diff = mImageWidth+1;
+                for (int i=0; i<ourSizes.length; i++) {
+                    int dwidth = Math.abs(ourSizes[i].getWidth() - mImageWidth);
+                    if (dwidth < diff)
+                        imageSize = ourSizes[i];
+                }
+
+                mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, mBackgroundHandler);
@@ -475,7 +487,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
                 // garbage capture data.
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                        width, height, largest);
+                        width, height, imageSize);
 
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = getResources().getConfiguration().orientation;
