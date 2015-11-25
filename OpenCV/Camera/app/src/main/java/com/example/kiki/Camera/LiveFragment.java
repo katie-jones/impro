@@ -106,7 +106,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.livefragment, container, false);
-
+        Log.e(TAG,"on create view");
         return mView;
     }
 
@@ -165,6 +165,10 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
+            Log.e(TAG,"Surface texture size changed");
+            Log.e(TAG,String.valueOf(width));
+            Log.e(TAG,String.valueOf(height));
+            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             configureTransform(width, height);
         }
 
@@ -417,6 +421,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
+        Log.e(TAG,"on view created");
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
     }
@@ -510,20 +515,26 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 int diff = mImageWidth+1;
                 for (int i=0; i<ourSizes.length; i++) {
                     int dwidth = Math.abs(ourSizes[i].getWidth() - mImageWidth);
-                    if (dwidth < diff)
+                    if (dwidth < diff) {
                         imageSize = ourSizes[i];
+                        //diff = dwidth;
+                    }
                 }
 
                 mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, mBackgroundHandler);
-
+//                Log.e(TAG, String.valueOf(imageSize.getWidth()));
+//                Log.e(TAG,String.valueOf(imageSize.getHeight()));
                 // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
                 // garbage capture data.
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                         width, height, imageSize);
+
+//                Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
+//                Log.e(TAG,String.valueOf(mPreviewSize.getHeight()));
 
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = getResources().getConfiguration().orientation;
@@ -632,6 +643,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
             // We configure the size of default buffer to be the size of camera preview we want.
             texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            Log.e(TAG,"Set default buffer size");
 
             // This is the output Surface we need to start preview.
             Surface surface = new Surface(texture);
@@ -641,8 +653,9 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                     = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mPreviewRequestBuilder.addTarget(surface);
 
+
             // Here, we create a CameraCaptureSession for camera preview.
-            mCameraDevice.createCaptureSession(Arrays.asList(surface, mImageReader.getSurface()),
+            mCameraDevice.createCaptureSession(Arrays.asList(surface,mImageReader.getSurface()),
                     new CameraCaptureSession.StateCallback() {
 
                         @Override
@@ -675,6 +688,11 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                         public void onConfigureFailed(
                                 @NonNull CameraCaptureSession cameraCaptureSession) {
                             showToast("Failed");
+                            Log.e(TAG,"Camera failed!");
+                            Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
+                            Log.e(TAG, String.valueOf(mPreviewSize.getHeight()));
+                            Log.e(TAG, String.valueOf(mImageReader.getWidth()));
+                            Log.e(TAG, String.valueOf(mImageReader.getHeight()));
                         }
                     }, null
             );
@@ -900,6 +918,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 BitmapFactory.Options mOptions = new BitmapFactory.Options();
                 mOptions.inMutable = true;
                 Bitmap mBitmap = mFactory.decodeByteArray(bytes, 0, bytes.length, mOptions);
+                Log.e(TAG,"Send bitmap");
                 mInterface.sendBitmap(mBitmap);
             }
             catch (Exception e) {

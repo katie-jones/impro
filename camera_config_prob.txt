@@ -1,0 +1,9 @@
+Problem: at time of call to CameraCaptureSession.StateCallback, size of TextureView was sometimes not compatible with possible camera output sizes
+Reason: size of TextureView was being updated between call to setDefaultBufferSize and callback method
+
+Possible explanation: somewhere between the setDefaultBufferSize and the callback, the TextureView size is being reinitialized or something by the loading of the xml file 
+In the xml file the width/height of textureview is set to wrap content. I guess on some level that means it has to load the textureview then wait a bit to see what the content will be before setting the size
+
+Somewhat solution: set the height/width of the textureview to be constant in the xml file 
+
+Better solution: set height/width of textureview dynamically

@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,8 @@ public class StillFragment extends Fragment {
 
     private void setImage() {
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.stillimageview);
+        assert imageView!=null;
+        Log.e("livefragment", "set image");
         imageView.setImageBitmap(mBitmap);
 
     }
