@@ -921,8 +921,9 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 BitmapFactory.Options mOptions = new BitmapFactory.Options();
                 mOptions.inMutable = true;
                 Bitmap mBitmap = mFactory.decodeByteArray(bytes, 0, bytes.length, mOptions);
-                Log.e(TAG,"Send bitmap");
+                Log.d(TAG,"Send bitmap");
                 mInterface.sendBitmap(mBitmap);
+                CommonResources.bitmap = mBitmap;
             }
             catch (Exception e) {
                 e.printStackTrace();
