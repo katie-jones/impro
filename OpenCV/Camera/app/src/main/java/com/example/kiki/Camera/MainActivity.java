@@ -35,17 +35,21 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     public void onButtonClicked(View v) {
 
         // Exchange current fragment with the other one.
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
         if (mLiveFragment.isVisible()){
-            transaction.replace(mLiveFragment.getId(), mStillFragment);
+            LiveFragment frag = (LiveFragment) mLiveFragment;
+            // take picture in live fragment
+            frag.takePicture();
         }
         else {
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.replace(mStillFragment.getId(), mLiveFragment);
+            transaction.commit();
         }
 
-        transaction.commit();
+
     }
 
+    // interface method from live fragment: initializes both fragments
     public void onFragmentCreated() {
         mLiveFragment = new LiveFragment();
         mStillFragment = new StillFragment();
@@ -56,7 +60,12 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
 
 
+    // interface method from live fragment: send bitmap to still fragment
     public void sendBitmap(Bitmap bitmap) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(mLiveFragment.getId(), mStillFragment);
+        transaction.commit();
+
         StillFragment frag = (StillFragment)mStillFragment;
         frag.putBitmap(bitmap);
     }

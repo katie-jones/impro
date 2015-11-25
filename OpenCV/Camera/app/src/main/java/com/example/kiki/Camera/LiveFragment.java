@@ -737,7 +737,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     /**
      * Initiate a still image capture.
      */
-    private void takePicture() {
+    public void takePicture() {
         lockFocus();
     }
 
@@ -751,6 +751,9 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                     CameraMetadata.CONTROL_AF_TRIGGER_START);
             // Tell #mCaptureCallback to wait for the lock.
             mState = STATE_WAITING_LOCK;
+            assert mBackgroundHandler !=null;
+            assert mPreviewRequestBuilder != null;
+            assert mCaptureSession != null;
             mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
                     mBackgroundHandler);
         } catch (CameraAccessException e) {
@@ -808,7 +811,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    showToast("Saved: " + mFile);
+//                    showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
 //                    unlockFocus();
                 }

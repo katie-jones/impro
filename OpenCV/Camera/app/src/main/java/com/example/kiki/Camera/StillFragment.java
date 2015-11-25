@@ -16,6 +16,7 @@ import android.widget.ImageView;
 public class StillFragment extends Fragment {
     private View mView; // View corresponding to fragment -- inflated xml file
     private Bitmap mBitmap;
+    private final static String TAG = "livefragment";
 
 
 
@@ -23,6 +24,7 @@ public class StillFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.e(TAG,"still on create view");
         mView = inflater.inflate(R.layout.stillfragment, container, false);
 
         return mView;
@@ -35,9 +37,10 @@ public class StillFragment extends Fragment {
     }
 
     private void setImage() {
+        Log.e(TAG, "set image");
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.stillimageview);
         assert imageView!=null;
-        Log.e("livefragment", "set image");
+        Log.e(TAG,"image view not null");
         imageView.setImageBitmap(mBitmap);
 
     }
