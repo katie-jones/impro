@@ -1,6 +1,7 @@
 package com.example.kiki.Camera;
 
 import android.graphics.Bitmap;
+import android.os.Bundle;
 
 /**
  * Class containing resources shared across the app.
@@ -10,4 +11,5 @@ import android.graphics.Bitmap;
 public class CommonResources {
     public static Bitmap bitmap;
 
+    public static Bundle Options;
 }

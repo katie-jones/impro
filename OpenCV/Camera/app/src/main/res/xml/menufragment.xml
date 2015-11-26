@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <CheckBoxPreference
+        android:key="p_color"
+        android:title="@string/p_color_title"
+        android:summary="@string/p_color_summ"
+        android:defaultValue="true" />
+    <ListPreference
+        android:dependency="p_color"
+        android:key="p_color_key"
+        android:title="@string/p_color_title"
+        android:dialogTitle="@string/p_color_dialog"
+        android:entries="@array/p_color_entries"
+        android:entryValues="@array/p_color_values"
+
+        />
+</PreferenceScreen>
