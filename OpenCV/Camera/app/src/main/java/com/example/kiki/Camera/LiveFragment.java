@@ -69,7 +69,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     private LiveFragmentInterface mInterface;
 
     public interface LiveFragmentInterface {
-        public void sendBitmap(Bitmap bitmap);
+        public void toStillFragment();
     }
 
     @Override
@@ -530,8 +530,9 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
                 // garbage capture data.
-                mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                        width, height, imageSize);
+                mPreviewSize = imageSize;
+                        //chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
+                        //width, height, imageSize);
 
 //                Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
 //                Log.e(TAG,String.valueOf(mPreviewSize.getHeight()));
@@ -716,10 +717,13 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
         }
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
         Matrix matrix = new Matrix();
+
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
+        bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+        matrix.setRectToRect(viewRect,bufferRect,Matrix.ScaleToFit.CENTER);
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             Log.e(TAG,"90");
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
