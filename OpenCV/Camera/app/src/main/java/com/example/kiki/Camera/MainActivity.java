@@ -58,15 +58,10 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         transaction.commit();
     }
 
-
-
     // interface method from live fragment: send bitmap to still fragment
-    public void sendBitmap(Bitmap bitmap) {
+    public void toStillFragment() {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(mLiveFragment.getId(), mStillFragment);
         transaction.commit();
-
-        StillFragment frag = (StillFragment)mStillFragment;
-        frag.putBitmap(bitmap);
     }
 }

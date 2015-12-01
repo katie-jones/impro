@@ -12,6 +12,9 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 /**
  * Created by kiki on 10.11.15.
@@ -32,11 +35,37 @@ public class StillFragment extends Fragment {
         mView = inflater.inflate(R.layout.stillfragment, container, false);
         mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
         mBitmap = CommonResources.bitmap;
+        applyFilter();
         if ((mBitmap!=null) && (mImageView!=null)) {
-            imageViewTransform(mImageView.getMaxWidth(),mImageView.getMaxHeight());
+            //imageViewTransform(mImageView.getMaxWidth(),mImageView.getMaxHeight());
+
             mImageView.setImageBitmap(mBitmap);
+
         }
         return mView;
+    }
+
+    private void applyFilter(int component,int lower,int upper) {
+        Mat mMat =new Mat();
+        Utils.bitmapToMat(mBitmap,mMat);
+        double width = mMat.size().width;
+        double height =  mMat.size().height;
+        // get good component
+
+        // apply filter
+        Mat newMat = new Mat();
+        for (int i=0; i<height; i++){
+            for (int j=0; j<width; j++) {
+                if ((mMat.get(i,j)[0]>=lower) && (mMat.get(i,j)[0]<=upper)){
+                    newMat.put(i, j,0.);
+                }
+                else {
+                    newMat.put(i,j,1.);
+                }
+
+            }
+        }
+        // convert to bitmap.
     }
 
     private void imageViewTransform(int viewWidth, int viewHeight) {
@@ -59,21 +88,6 @@ public class StillFragment extends Fragment {
             matrix.postRotate(180, centerX, centerY);
         }
         mImageView.setImageMatrix(matrix);
-    }
-
-    public void putBitmap(Bitmap bm)
-    {
-        //mBitmap = bm;
-        //setImage();
-    }
-
-    private void setImage() {
-        Log.e(TAG, "set image");
-        ImageView imageView = (ImageView) getActivity().findViewById(R.id.stillimageview);
-        assert imageView!=null;
-        Log.e(TAG,"image view not null");
-        imageView.setImageBitmap(mBitmap);
-
     }
 
 
