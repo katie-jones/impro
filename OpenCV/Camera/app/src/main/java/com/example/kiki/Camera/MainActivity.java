@@ -22,6 +22,7 @@ import org.opencv.core.Mat;
 public class MainActivity extends Activity implements MainFragment.MainInterface, LiveFragment.LiveFragmentInterface {
     private Fragment mStillFragment;
     private Fragment mLiveFragment;
+    static private String TAG = "MainActivity";
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -30,14 +31,19 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
     }
 
-
+    static {
+        if (!OpenCVLoader.initDebug()){
+            Log.e(TAG,"OpenCV not loaded");
+        }
+    }
 
     public void onButtonClicked(View v) {
 
         // Exchange current fragment with the other one.
         if (mLiveFragment.isVisible()){
             LiveFragment frag = (LiveFragment) mLiveFragment;
-            // take picture in live fragment
+            // take picture in live fragment, when its done, the fragment will change to
+            // still fragment via Callback.
             frag.takePicture();
         }
         else {
@@ -54,7 +60,8 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         mLiveFragment = new LiveFragment();
         mStillFragment = new StillFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.cameraview, mStillFragment);
+        //transaction.replace(R.id.cameraview, mStillFragment);
+        transaction.replace(R.id.cameraview, mLiveFragment);
         transaction.commit();
     }
 

@@ -13,7 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 /**
@@ -35,37 +37,53 @@ public class StillFragment extends Fragment {
         mView = inflater.inflate(R.layout.stillfragment, container, false);
         mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
         mBitmap = CommonResources.bitmap;
-        applyFilter();
+        if (mBitmap!=null) {
+            Log.e(TAG,"Bitmap loaded");
+        }
         if ((mBitmap!=null) && (mImageView!=null)) {
             //imageViewTransform(mImageView.getMaxWidth(),mImageView.getMaxHeight());
-
+            applyFilter(0,0,50);
+            Log.e(TAG,"Filter applied");
             mImageView.setImageBitmap(mBitmap);
-
         }
         return mView;
     }
 
-    private void applyFilter(int component,int lower,int upper) {
-        Mat mMat =new Mat();
-        Utils.bitmapToMat(mBitmap,mMat);
-        double width = mMat.size().width;
-        double height =  mMat.size().height;
+    private void applyFilter(int component, int lower, int upper) {
+        int width = mBitmap.getWidth();
+        int height = mBitmap.getHeight();
+        Mat mMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
+        // all pixels above "upper" set to 0, other pixels untouched.
+        Imgproc.threshold(mMat,mMat,upper,0,Imgproc.THRESH_TOZERO_INV);
+        // all pixels below "lower" set to 0, other pixels set to 1.
+        Imgproc.threshold(mMat,mMat,lower,255,Imgproc.THRESH_BINARY);
+        Utils.matToBitmap(mMat,mBitmap);
+    }
+
+    private void applyFilter2(int component,int lower,int upper) {
+        assert lower<upper;
+        int width = mBitmap.getWidth();
+        int height = mBitmap.getHeight();
+        Mat originalMat =new Mat(height,width,CvType.CV_8UC4);
+        Utils.bitmapToMat(mBitmap,originalMat);
         // get good component
 
         // apply filter
-        Mat newMat = new Mat();
+        Mat filteredMat = new Mat(height,width, CvType.CV_8UC1);
         for (int i=0; i<height; i++){
             for (int j=0; j<width; j++) {
-                if ((mMat.get(i,j)[0]>=lower) && (mMat.get(i,j)[0]<=upper)){
-                    newMat.put(i, j,0.);
+                if ((originalMat.get(i,j)[0]>=lower) && (originalMat.get(i,j)[0]<=upper)){
+                    filteredMat.put(i, j,0);
                 }
                 else {
-                    newMat.put(i,j,1.);
+                    filteredMat.put(i,j,1);
                 }
 
             }
         }
         // convert to bitmap.
+        Utils.matToBitmap(filteredMat,mBitmap);
+
     }
 
     private void imageViewTransform(int viewWidth, int viewHeight) {

@@ -497,13 +497,11 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
-
                 StreamConfigurationMap map = characteristics.get(
                         CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 if (map == null) {
                     continue;
                 }
-
                 // For still image captures, we use the largest available size.
 //                Size largest = Collections.max(
 //                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
@@ -938,8 +936,8 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 mOptions.inMutable = true;
                 Bitmap mBitmap = mFactory.decodeByteArray(bytes, 0, bytes.length, mOptions);
                 Log.d(TAG,"Send bitmap");
-                mInterface.sendBitmap(mBitmap);
                 CommonResources.bitmap = mBitmap;
+                mInterface.toStillFragment();
             }
             catch (Exception e) {
                 e.printStackTrace();
