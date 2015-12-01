@@ -13,7 +13,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 
-
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
@@ -25,17 +24,33 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     private Fragment mLiveFragment;
     static private String TAG = "MainActivity";
 
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS:
+                {
+                    Log.i(TAG, "OpenCV loaded successfully");
+                } break;
+                default:
+                {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_6, this, mLoaderCallback);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-    }
-
-    static {
-        if (!OpenCVLoader.initDebug()){
-            Log.e(TAG,"OpenCV not loaded");
-        }
     }
 
     public void onButtonClicked(View v) {
