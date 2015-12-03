@@ -24,8 +24,9 @@ import org.opencv.imgproc.Imgproc;
 public class StillFragment extends Fragment {
     private View mView; // View corresponding to fragment -- inflated xml file
     private Bitmap mBitmap;
+    private Bitmap rotatedBitmap;
     private ImageView mImageView;
-    private final static String TAG = "livefragment";
+    private final static String TAG = "StillFragment";
 
 
 
@@ -41,12 +42,23 @@ public class StillFragment extends Fragment {
             Log.e(TAG,"Bitmap loaded");
         }
         if ((mBitmap!=null) && (mImageView!=null)) {
-            imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
-//            applyFilter(0,200);
-            Log.e(TAG,"Filter applied");
-            mImageView.setImageBitmap(mBitmap);
+//            Log.e(TAG,String.valueOf(mImageView.getMeasuredWidth()));
+//            Log.e(TAG,String.valueOf(mImageView.getMeasuredHeight()));
+            if (savedInstanceState==null){
+                imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
+              }
+//          applyFilter(0,200);
+            //Log.e(TAG, "Filter applied");
+            mImageView.setImageBitmap(rotatedBitmap);
+            //mImageView.setImageBitmap(rotatedBitmap);
         }
         return mView;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     private void applyFilter(int lower, int upper) {
@@ -57,44 +69,55 @@ public class StillFragment extends Fragment {
         // all pixels above "upper" set to 0, other pixels untouched.
         Imgproc.threshold(mMat,mMat,upper,0,Imgproc.THRESH_TOZERO_INV);
         // all pixels below "lower" set to 0, other pixels set to 1.
-        Imgproc.threshold(mMat,mMat,lower,255,Imgproc.THRESH_BINARY);
-        Utils.matToBitmap(mMat,mBitmap);
+        Imgproc.threshold(mMat, mMat, lower, 255, Imgproc.THRESH_BINARY);
+        Utils.matToBitmap(mMat, mBitmap);
     }
 
 
     private void imageViewTransform(int viewWidth, int viewHeight) {
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
-        Log.e(TAG,String.valueOf(rotation));
+        //Log.e(TAG,String.valueOf(rotation));
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         RectF bufferRect = new RectF(0, 0, mBitmap.getHeight(), mBitmap.getWidth());
+        RectF bufferRect2 = new RectF(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
-//        matrix.postRotate(180,centerX,centerY);
-        // rotation = 0, need to rotate by 90
+
+        Log.e(TAG, String.valueOf(rotation));
+
+
+
+
+
+        if (Surface.ROTATION_0 == rotation || Surface.ROTATION_180 == rotation) {
+            bufferRect2.offset(centerX - bufferRect2.centerX(),centerY - bufferRect2.centerY());
+            matrix.setRectToRect(viewRect, bufferRect2, Matrix.ScaleToFit.FILL);
+            float scale = Math.max(
+                    (float) viewHeight / mBitmap.getHeight(),
+                    (float) viewWidth / mBitmap.getWidth());
+            matrix.postScale(scale, scale, centerX, centerY);
+        }
+        // rotation = 0
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-            // rotation = 1
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
             float scale = Math.max(
                     (float) viewHeight / mBitmap.getHeight(),
                     (float) viewWidth / mBitmap.getWidth());
             matrix.postScale(scale, scale, centerX, centerY);
-            if (Surface.ROTATION_270 == rotation) {
-                Log.e(TAG, "still rotation 270");
-                // rotation 3
-                matrix.postRotate(-90, centerX, centerY);
-            }
-            else{
-                Log.e(TAG, "still rotation 90");
-                matrix.postRotate(90 * (rotation + 1), centerX, centerY);
-            }
-        } else if (Surface.ROTATION_180 == rotation) {
-            Log.e(TAG,"still rotation 180");
-            // rotation = 2, need to rotate by 270
-            matrix.postRotate(90*(rotation+1), centerX, centerY);
+            // 90: rotation 1, 270: rotation 3, 180: 2, 0: 0
+
         }
-        mImageView.setImageMatrix(matrix);
+        matrix.postRotate(90*(1-rotation), centerX, centerY);
+        rotatedBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
+    }
+
+    public void onRotated() {
+        Log.e(TAG,"on rotated");
+        //rotatedBitmap=mBitmap;
+//        imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
+//        mImageView.setImageBitmap(rotatedBitmap);
     }
 
 

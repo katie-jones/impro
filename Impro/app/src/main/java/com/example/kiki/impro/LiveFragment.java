@@ -80,6 +80,12 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -720,8 +726,8 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
         RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
-        bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-        matrix.setRectToRect(viewRect,bufferRect,Matrix.ScaleToFit.FILL);
+//        bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+//        matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
