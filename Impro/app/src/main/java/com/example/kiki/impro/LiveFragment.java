@@ -515,7 +515,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                     int dwidth = Math.abs(ourSizes[i].getWidth() - mImageWidth);
                     if (dwidth < diff) {
                         imageSize = ourSizes[i];
-                        //diff = dwidth;
+                        diff = dwidth;
                     }
                 }
 
@@ -528,9 +528,9 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
                 // garbage capture data.
-                mPreviewSize = imageSize;
-                        //chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                        //width, height, imageSize);
+//                mPreviewSize = imageSize;
+                mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
+                        width, height, imageSize);
 
 //                Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
 //                Log.e(TAG,String.valueOf(mPreviewSize.getHeight()));
@@ -721,29 +721,23 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
         bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-        matrix.setRectToRect(viewRect,bufferRect,Matrix.ScaleToFit.CENTER);
+        matrix.setRectToRect(viewRect,bufferRect,Matrix.ScaleToFit.FILL);
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-            Log.e(TAG,"90");
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.CENTER);
+            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
             float scale = Math.max(
                     (float) viewHeight / mPreviewSize.getHeight(),
                     (float) viewWidth / mPreviewSize.getWidth());
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
         } else if (Surface.ROTATION_180 == rotation) {
-            Log.e(TAG,"180");
             matrix.postRotate(180, centerX, centerY);
         }
         Log.e(TAG,"configureTransform");
         Log.e(TAG, String.valueOf(viewHeight));
         Log.e(TAG,String.valueOf(viewWidth));
-        Log.e(TAG,String.valueOf(mTextureView.getHeight()));
-        Log.e(TAG,String.valueOf(mTextureView.getWidth()));
         Log.e(TAG,String.valueOf(mPreviewSize.getHeight()));
         Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
-        Log.e(TAG,String.valueOf(mImageReader.getHeight()));
-        Log.e(TAG, String.valueOf(mImageReader.getWidth()));
         mTextureView.setTransform(matrix);
         //mTextureView.requestLayout();
     }

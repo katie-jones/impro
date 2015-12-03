@@ -15,4 +15,6 @@
     <string name="p_color_summ">Summary</string>
     <string name="p_color_dialog">Dialog</string>
     <string name="p_color_default">Default</string>
+
+    <string name="picture_description">Hier ist ein schoenes Bild!</string>
 </resources>

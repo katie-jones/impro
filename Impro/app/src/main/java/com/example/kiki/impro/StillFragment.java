@@ -41,18 +41,19 @@ public class StillFragment extends Fragment {
             Log.e(TAG,"Bitmap loaded");
         }
         if ((mBitmap!=null) && (mImageView!=null)) {
-            //imageViewTransform(mImageView.getMaxWidth(),mImageView.getMaxHeight());
-            applyFilter(0,0,50);
+            imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
+//            applyFilter(0,200);
             Log.e(TAG,"Filter applied");
             mImageView.setImageBitmap(mBitmap);
         }
         return mView;
     }
 
-    private void applyFilter(int component, int lower, int upper) {
+    private void applyFilter(int lower, int upper) {
         int width = mBitmap.getWidth();
         int height = mBitmap.getHeight();
         Mat mMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
+        Utils.bitmapToMat(mBitmap,mMat);
         // all pixels above "upper" set to 0, other pixels untouched.
         Imgproc.threshold(mMat,mMat,upper,0,Imgproc.THRESH_TOZERO_INV);
         // all pixels below "lower" set to 0, other pixels set to 1.
@@ -60,31 +61,6 @@ public class StillFragment extends Fragment {
         Utils.matToBitmap(mMat,mBitmap);
     }
 
-    private void applyFilter2(int component,int lower,int upper) {
-        assert lower<upper;
-        int width = mBitmap.getWidth();
-        int height = mBitmap.getHeight();
-        Mat originalMat =new Mat(height,width,CvType.CV_8UC4);
-        Utils.bitmapToMat(mBitmap,originalMat);
-        // get good component
-
-        // apply filter
-        Mat filteredMat = new Mat(height,width, CvType.CV_8UC1);
-        for (int i=0; i<height; i++){
-            for (int j=0; j<width; j++) {
-                if ((originalMat.get(i,j)[0]>=lower) && (originalMat.get(i,j)[0]<=upper)){
-                    filteredMat.put(i, j,0);
-                }
-                else {
-                    filteredMat.put(i,j,1);
-                }
-
-            }
-        }
-        // convert to bitmap.
-        Utils.matToBitmap(filteredMat,mBitmap);
-
-    }
 
     private void imageViewTransform(int viewWidth, int viewHeight) {
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
@@ -94,16 +70,29 @@ public class StillFragment extends Fragment {
         RectF bufferRect = new RectF(0, 0, mBitmap.getHeight(), mBitmap.getWidth());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
+//        matrix.postRotate(180,centerX,centerY);
+        // rotation = 0, need to rotate by 90
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+            // rotation = 1
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
             float scale = Math.max(
                     (float) viewHeight / mBitmap.getHeight(),
                     (float) viewWidth / mBitmap.getWidth());
             matrix.postScale(scale, scale, centerX, centerY);
-            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+            if (Surface.ROTATION_270 == rotation) {
+                Log.e(TAG, "still rotation 270");
+                // rotation 3
+                matrix.postRotate(-90, centerX, centerY);
+            }
+            else{
+                Log.e(TAG, "still rotation 90");
+                matrix.postRotate(90 * (rotation + 1), centerX, centerY);
+            }
         } else if (Surface.ROTATION_180 == rotation) {
-            matrix.postRotate(180, centerX, centerY);
+            Log.e(TAG,"still rotation 180");
+            // rotation = 2, need to rotate by 270
+            matrix.postRotate(90*(rotation+1), centerX, centerY);
         }
         mImageView.setImageMatrix(matrix);
     }
