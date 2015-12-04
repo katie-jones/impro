@@ -550,7 +550,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                     mTextureView.setAspectRatio(
                             mPreviewSize.getHeight(), mPreviewSize.getWidth());
                 }
-
                 mCameraId = cameraId;
                 return;
             }

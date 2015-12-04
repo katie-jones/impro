@@ -42,15 +42,13 @@ public class StillFragment extends Fragment {
             Log.e(TAG,"Bitmap loaded");
         }
         if ((mBitmap!=null) && (mImageView!=null)) {
-//            Log.e(TAG,String.valueOf(mImageView.getMeasuredWidth()));
-//            Log.e(TAG,String.valueOf(mImageView.getMeasuredHeight()));
             if (savedInstanceState==null){
                 imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
               }
 //          applyFilter(0,200);
             //Log.e(TAG, "Filter applied");
+//            mImageView.setImageBitmap(mBitmap);
             mImageView.setImageBitmap(rotatedBitmap);
-            //mImageView.setImageBitmap(rotatedBitmap);
         }
         return mView;
     }
@@ -110,7 +108,10 @@ public class StillFragment extends Fragment {
 
         }
         matrix.postRotate(90*(1-rotation), centerX, centerY);
+//        Matrix matrix2 = new Matrix();
+//        matrix2.postRotate(90);
         rotatedBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
+       // mImageView.setImageMatrix(matrix2);
     }
 
     public void onRotated() {
