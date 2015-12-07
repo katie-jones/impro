@@ -16,5 +16,16 @@
     <string name="p_color_dialog">Dialog</string>
     <string name="p_color_default">Default</string>
 
+    <string name="p_quality_title">Quality</string>
+    <string name="p_quality_dialog">Choose the picture quality</string>
+    <string name="p_quality_default">100%</string>
+
+    <string name="p_numberpicker_summary">Choose the picture quality</string>
+    <string name="p_numberpicker_title">Quality</string>
+
     <string name="picture_description">Hier ist ein schoenes Bild!</string>
+
+    <string name="quality">Quality</string>
+    <string name="numberPicker1Title">Quality</string>
+
 </resources>

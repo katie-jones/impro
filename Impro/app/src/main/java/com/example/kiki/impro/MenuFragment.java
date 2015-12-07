@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 public class MenuFragment extends PreferenceFragment {
     //private View mView; // View corresponding to fragment -- inflated xml file
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
