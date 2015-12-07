@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Kool Kamera</string>
+    <string name="app_name">ImPro</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -15,4 +15,6 @@
     <string name="p_color_summ">Summary</string>
     <string name="p_color_dialog">Dialog</string>
     <string name="p_color_default">Default</string>
+
+    <string name="picture_description">Hier ist ein schoenes Bild!</string>
 </resources>

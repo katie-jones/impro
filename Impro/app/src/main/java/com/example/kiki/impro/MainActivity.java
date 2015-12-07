@@ -13,7 +13,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 
-
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
@@ -24,22 +23,42 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     private Fragment mStillFragment;
     private Fragment mLiveFragment;
     static private String TAG = "MainActivity";
+    private static final String TAG_LIVE_FRAGMENT = "live_fragment";
+    private static final String TAG_STILL_FRAGMENT = "still_fragment";
+    private static boolean stillActive;
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS:
+                {
+                    Log.i(TAG, "OpenCV loaded successfully");
+                } break;
+                default:
+                {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_6, this, mLoaderCallback);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-    }
 
-    static {
-        if (!OpenCVLoader.initDebug()){
-            Log.e(TAG,"OpenCV not loaded");
-        }
     }
 
     public void onButtonClicked(View v) {
-
+        Log.e(TAG,"button clicked");
         // Exchange current fragment with the other one.
         if (mLiveFragment.isVisible()){
             LiveFragment frag = (LiveFragment) mLiveFragment;
@@ -49,7 +68,8 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         }
         else {
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(mStillFragment.getId(), mLiveFragment);
+            transaction.replace(mStillFragment.getId(), mLiveFragment, TAG_LIVE_FRAGMENT);
+            stillActive=false;
             transaction.commit();
         }
 
@@ -57,19 +77,37 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     }
 
     // interface method from live fragment: initializes both fragments
-    public void onFragmentCreated() {
-        mLiveFragment = new LiveFragment();
-        mStillFragment = new StillFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        //transaction.replace(R.id.cameraview, mStillFragment);
-        transaction.replace(R.id.cameraview, mLiveFragment);
-        transaction.commit();
+    public void onFragmentCreated(Bundle savedInstanceState) {
+        Log.e(TAG,"fragment created");
+        mLiveFragment = getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
+        mStillFragment = getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
+        if (mLiveFragment==null)
+            mLiveFragment = new LiveFragment();
+        if (mStillFragment==null)
+            mStillFragment = new StillFragment();
+
+        if (savedInstanceState==null) {
+
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            //transaction.replace(R.id.cameraview, mStillFragment);
+            transaction.replace(R.id.cameraview, mLiveFragment, TAG_LIVE_FRAGMENT);
+            stillActive=false;
+            transaction.commit();
+        }
+        else {
+            if (stillActive) {
+                StillFragment frag = (StillFragment) mStillFragment;
+                frag.onRotated();
+            }
+        }
     }
 
     // interface method from live fragment: send bitmap to still fragment
     public void toStillFragment() {
+        Log.e(TAG,"to still fragment");
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(mLiveFragment.getId(), mStillFragment);
+        transaction.replace(mLiveFragment.getId(), mStillFragment, TAG_STILL_FRAGMENT);
+        stillActive=true;
         transaction.commit();
     }
 }

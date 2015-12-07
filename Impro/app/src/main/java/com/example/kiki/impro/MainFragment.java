@@ -27,7 +27,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     public interface MainInterface {
         public void onButtonClicked(View v);
-        public void onFragmentCreated();
+        public void onFragmentCreated(Bundle savedInstanceState);
     }
 
     @Override
@@ -44,7 +44,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mMainInterface.onFragmentCreated();
+        mMainInterface.onFragmentCreated(savedInstanceState);
+
+
     }
 
 
