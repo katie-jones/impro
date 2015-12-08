@@ -45,7 +45,7 @@ public class StillFragment extends Fragment {
             if (savedInstanceState==null){
                 imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
               }
-//          applyFilter(0,200);
+//          applyFilter(0,0,200);
             //Log.e(TAG, "Filter applied");
 //            mImageView.setImageBitmap(mBitmap);
             mImageView.setImageBitmap(rotatedBitmap);
@@ -59,7 +59,7 @@ public class StillFragment extends Fragment {
         setRetainInstance(true);
     }
 
-    private void applyFilter(int lower, int upper) {
+    private void applyFilter(int component, int lower, int upper) {
         int width = mBitmap.getWidth();
         int height = mBitmap.getHeight();
         Mat mMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
@@ -83,10 +83,6 @@ public class StillFragment extends Fragment {
         float centerY = viewRect.centerY();
 
         Log.e(TAG, String.valueOf(rotation));
-
-
-
-
 
         if (Surface.ROTATION_0 == rotation || Surface.ROTATION_180 == rotation) {
             bufferRect2.offset(centerX - bufferRect2.centerX(),centerY - bufferRect2.centerY());
@@ -120,23 +116,5 @@ public class StillFragment extends Fragment {
 //        imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
 //        mImageView.setImageBitmap(rotatedBitmap);
     }
-
-
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-        //super.onActivityCreated(savedInstanceState);
-
-        // Check to see if we have a frame in which to embed the details
-        // fragment directly in the containing UI.
-//        View mainFrame = getActivity().findViewById(R.id.activity_main);
-//        mDualPane = mainFrame != null && mainFrame.getVisibility() == View.VISIBLE;
-//
-//        if (mDualPane) {
-//            // In dual-pane mode, the list view highlights the selected item.
-//            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-//            // Make sure our UI is in the correct state.
-//            showDetails(mCurCheckPosition);
-//        }
-//    }
 
 }
