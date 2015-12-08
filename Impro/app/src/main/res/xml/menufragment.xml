@@ -2,6 +2,7 @@
 
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
@@ -13,23 +14,15 @@
         android:entries="@array/p_color_entries"
         android:entryValues="@array/p_color_values" />
 
-    <ListPreference
-        android:key="p_quality_key"
-        android:title="@string/p_quality_title"
-        android:dialogTitle="@string/p_quality_dialog"
-        android:entries="@array/p_quality_entries"
-        android:entryValues="@array/p_quality_values" />
-
     <com.example.kiki.impro.NumberPickerPreference
-        android:key="p_numberpicker_key"
+        android:id="@+id/numberPickerPref"
+        android:key="p_quality_key"
         android:title="@string/p_numberpicker_title"
         android:summary="@string/p_numberpicker_summary"
         android:positiveButtonText="@android:string/ok"
         android:negativeButtonText="@android:string/cancel"
+        android:defaultValue="50"
         />
-
-
-
 
 </PreferenceScreen>
 

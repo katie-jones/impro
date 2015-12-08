@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,7 +44,16 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             }
         }
     };
-
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        Log.e(TAG,"Save");
+        super.onSaveInstanceState(savedInstanceState);
+    }
+    @Override
+    public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        Log.e(TAG,"Restore");
+        super.onRestoreInstanceState(savedInstanceState);
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -53,8 +64,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        PreferenceManager.setDefaultValues(this, R.xml.menufragment, false);
     }
 
     public void onButtonClicked(View v) {
