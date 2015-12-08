@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+
 /**
  * Created by kiki on 10.11.15.
  */
@@ -20,6 +21,8 @@ public class ColorbarFragment extends Fragment {
         mView = inflater.inflate(R.layout.colorbarfragment, container, false);
         return mView;
     }
+
+
 //    @Override
 //    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
 //        Log.e(TAG, "Save");
