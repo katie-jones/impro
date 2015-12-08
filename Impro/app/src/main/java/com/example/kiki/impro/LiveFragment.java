@@ -112,7 +112,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.livefragment, container, false);
-        Log.e(TAG,"on create view");
+//        Log.e(TAG,"on create view");
         return mView;
     }
 
@@ -171,9 +171,9 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
-            Log.e(TAG,"Surface texture size changed");
-            Log.e(TAG,String.valueOf(width));
-            Log.e(TAG,String.valueOf(height));
+//            Log.e(TAG,"Surface texture size changed");
+//            Log.e(TAG,String.valueOf(width));
+//            Log.e(TAG,String.valueOf(height));
             texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             configureTransform(width, height);
         }
@@ -427,7 +427,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        Log.e(TAG,"on view created");
+//        Log.e(TAG,"on view created");
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
     }
@@ -692,11 +692,11 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                         public void onConfigureFailed(
                                 @NonNull CameraCaptureSession cameraCaptureSession) {
                             showToast("Failed");
-                            Log.e(TAG,"Camera failed!");
-                            Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
-                            Log.e(TAG, String.valueOf(mPreviewSize.getHeight()));
-                            Log.e(TAG, String.valueOf(mImageReader.getWidth()));
-                            Log.e(TAG, String.valueOf(mImageReader.getHeight()));
+//                            Log.e(TAG,"Camera failed!");
+//                            Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
+//                            Log.e(TAG, String.valueOf(mPreviewSize.getHeight()));
+//                            Log.e(TAG, String.valueOf(mImageReader.getWidth()));
+//                            Log.e(TAG, String.valueOf(mImageReader.getHeight()));
                         }
                     }, null
             );
@@ -738,11 +738,11 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
         } else if (Surface.ROTATION_180 == rotation) {
             matrix.postRotate(180, centerX, centerY);
         }
-        Log.e(TAG,"configureTransform");
-        Log.e(TAG, String.valueOf(viewHeight));
-        Log.e(TAG,String.valueOf(viewWidth));
-        Log.e(TAG,String.valueOf(mPreviewSize.getHeight()));
-        Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
+//        Log.e(TAG,"configureTransform");
+//        Log.e(TAG, String.valueOf(viewHeight));
+//        Log.e(TAG,String.valueOf(viewWidth));
+//        Log.e(TAG,String.valueOf(mPreviewSize.getHeight()));
+//        Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
         mTextureView.setTransform(matrix);
         //mTextureView.requestLayout();
     }
