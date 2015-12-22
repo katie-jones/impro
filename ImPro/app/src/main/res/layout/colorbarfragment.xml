@@ -12,8 +12,21 @@
         android:text="@string/colorbar" />
 
     <org.florescu.android.rangeseekbar.RangeSeekBar
+        android:id="@+id/seekbar1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        org.florescu.android.rangeseekbar.absoluteMaxValue="150"
-        org.florescu.android.rangeseekbar.absoluteMinValue="20"/>
+        rsb:absoluteMaxValue="255"
+        rsb:absoluteMinValue="0"/>
+    <org.florescu.android.rangeseekbar.RangeSeekBar
+        android:id="@+id/seekbar2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        rsb:absoluteMaxValue="255"
+        rsb:absoluteMinValue="0"/>
+    <org.florescu.android.rangeseekbar.RangeSeekBar
+        android:id="@+id/seekbar3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        rsb:absoluteMaxValue="255"
+        rsb:absoluteMinValue="0"/>
 </LinearLayout>
