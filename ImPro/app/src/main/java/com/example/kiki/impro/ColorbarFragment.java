@@ -35,13 +35,21 @@ public class ColorbarFragment extends Fragment {
         mSeekBar2 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar2);
         mSeekBar3 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar3);
 
+        SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        mSeekBar1.setSelectedMinValue(mPrefs.getInt("lower1", 0));
+        mSeekBar2.setSelectedMinValue(mPrefs.getInt("lower2", 0));
+        mSeekBar3.setSelectedMinValue(mPrefs.getInt("lower3", 0));
+        mSeekBar1.setSelectedMaxValue(mPrefs.getInt("upper1", 255));
+        mSeekBar2.setSelectedMaxValue(mPrefs.getInt("upper2", 255));
+        mSeekBar3.setSelectedMaxValue(mPrefs.getInt("upper3", 255));
 
 
         RangeSeekBar.OnRangeSeekBarChangeListener<Integer> listener = new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
-            SharedPreferences mPrefs = getActivity().getSharedPreferences("my",Context.MODE_PRIVATE);
-            //SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+            //SharedPreferences mPrefs = getActivity().getSharedPreferences("",Context.MODE_PRIVATE);
+            SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor mEditor = mPrefs.edit();
-            Integer test = 0;
+            int test;
 
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue, Integer maxValue) {
@@ -60,8 +68,10 @@ public class ColorbarFragment extends Fragment {
                     mEditor.putInt("upper3", maxValue);
                 }
                 mEditor.apply();
-                SharedPreferences mPrefs2 = getActivity().getSharedPreferences("my",Context.MODE_PRIVATE);
-                mPrefs2.getInt("lower3", test);
+                // TESTING: check if shared preferences have been updated correctly
+                //SharedPreferences mPrefs2 = getActivity().getSharedPreferences("my",Context.MODE_PRIVATE);
+                SharedPreferences mPrefs2 = getActivity().getPreferences(Context.MODE_PRIVATE);
+                test =  mPrefs2.getInt("lower3", 0);
                 Log.e(TAG, "lower3:" + String.valueOf(test));
             }
         };
@@ -72,7 +82,6 @@ public class ColorbarFragment extends Fragment {
 
         return mView;
     }
-
 
 //    @Override
 //    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {

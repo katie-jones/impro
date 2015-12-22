@@ -11,6 +11,4 @@
         android:layout_alignParentTop="true"
         android:scaleType="centerInside"
          />
-
-
 </RelativeLayout>
