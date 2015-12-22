@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -68,7 +69,7 @@ public class StillFragment extends Fragment {
         int height = rotatedBitmap.getHeight();
         int depth = 3;
 
-        SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
 
         Mat mMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
@@ -80,18 +81,21 @@ public class StillFragment extends Fragment {
 
         switch (type) {
             case 0: // RGB
+                Log.e(TAG,"RGB");
                 depth = 3;
                 pixelvector = new byte[depth+1];
                 zeros = new byte[depth+1];
                 colorMat = mMat;
                 break;
             case 1: // HSV
+                Log.e(TAG,"HSV");
                 Imgproc.cvtColor(mMat, colorMat, Imgproc.COLOR_RGB2HSV);
                 depth = 3;
-                pixelvector = new byte[depth+1];
+                pixelvector = new byte[depth];
                 zeros = new byte[depth+1];
                 break;
             case 2: // CMYK
+                Log.e(TAG,"CMYK");
                 cvt2CMYK(mMat, colorMat);
                 depth = 4;
                 pixelvector = new byte[depth];

@@ -12,7 +12,10 @@
         android:title="@string/p_color_title"
         android:dialogTitle="@string/p_color_dialog"
         android:entries="@array/p_color_entries"
-        android:entryValues="@array/p_color_values" />
+        android:entryValues="@array/p_color_values"
+        android:defaultValue="0"
+        android:persistent="true"
+        />
 
     <com.example.kiki.impro.NumberPickerPreference
         android:id="@+id/numberPickerPref"

@@ -35,7 +35,8 @@ public class ColorbarFragment extends Fragment {
         mSeekBar2 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar2);
         mSeekBar3 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar3);
 
-        SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+//        SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         mSeekBar1.setSelectedMinValue(mPrefs.getInt("lower1", 0));
         mSeekBar2.setSelectedMinValue(mPrefs.getInt("lower2", 0));
@@ -47,7 +48,8 @@ public class ColorbarFragment extends Fragment {
 
         RangeSeekBar.OnRangeSeekBarChangeListener<Integer> listener = new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
             //SharedPreferences mPrefs = getActivity().getSharedPreferences("",Context.MODE_PRIVATE);
-            SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+//            SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             SharedPreferences.Editor mEditor = mPrefs.edit();
             int test;
 
