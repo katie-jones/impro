@@ -1,9 +1,9 @@
 <resources>
-    <integer-array name="p_color_values">
+    <string-array name="p_color_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
-    </integer-array>
+    </string-array>
 
     <string-array name="p_color_entries">
         <item>RGB</item>
@@ -11,7 +11,7 @@
         <item>CMYK</item>
     </string-array>
 
-    <integer-array name="p_quality_values">
+    <string-array name="p_quality_values">
         <item>10</item>
         <item>20</item>
         <item>30</item>
@@ -22,7 +22,7 @@
         <item>80</item>
         <item>90</item>
         <item>100</item>
-    </integer-array>
+    </string-array>
 
     <string-array name="p_quality_entries">
         <item>10%</item>

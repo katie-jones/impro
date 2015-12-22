@@ -69,7 +69,7 @@ public class StillFragment extends Fragment {
         int depth = 3;
 
         SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-        int type = mPrefs.getInt("p_color_key", 3);
+        int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
 
         Mat mMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
         Mat colorMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
