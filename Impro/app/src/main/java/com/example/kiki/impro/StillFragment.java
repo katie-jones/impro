@@ -49,7 +49,7 @@ public class StillFragment extends Fragment {
             if (savedInstanceState==null){
                 imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
               }
-          applyFilter(0,200);
+          applyFilter();
             //Log.e(TAG, "Filter applied");
 //            mImageView.setImageBitmap(mBitmap);
             mImageView.setImageBitmap(rotatedBitmap);
@@ -63,7 +63,7 @@ public class StillFragment extends Fragment {
         setRetainInstance(true);
     }
 
-    private void applyFilter(int lower, int upper) {
+    private void applyFilter() {
         int width = rotatedBitmap.getWidth();
         int height = rotatedBitmap.getHeight();
         int depth = 3;
