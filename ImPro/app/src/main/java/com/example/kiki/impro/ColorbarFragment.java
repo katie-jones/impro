@@ -103,6 +103,7 @@ public class ColorbarFragment extends Fragment {
         mSeekBar1.setOnRangeSeekBarChangeListener(listener);
         mSeekBar2.setOnRangeSeekBarChangeListener(listener);
         mSeekBar3.setOnRangeSeekBarChangeListener(listener);
+        mSeekBar4.setOnRangeSeekBarChangeListener(listener);
 
         return mView;
     }

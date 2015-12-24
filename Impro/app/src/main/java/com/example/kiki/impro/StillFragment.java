@@ -138,7 +138,6 @@ public class StillFragment extends Fragment {
                 }
                 if (!inrange) {
                     mMat.put(i, j, zeros);
-                    //Log.e(TAG,"not in range");
                 }
             }
         }
@@ -206,7 +205,7 @@ public class StillFragment extends Fragment {
         final int depth = 4;
         byte[] pixelvector = new byte[depth];
         float r_prime, g_prime, b_prime, k;
-        byte c,m,y;
+        int c,m,y,kint;
         final float maxval = 255;
 
         for (int i = 0; i<mMat.height(); i++) {
@@ -215,14 +214,15 @@ public class StillFragment extends Fragment {
                 r_prime = (float)pixelvector[0]/maxval;
                 g_prime = (float)pixelvector[1]/maxval;
                 b_prime = (float)pixelvector[2]/maxval;
-                k = maxval * (1-Math.max(r_prime,Math.max(g_prime,b_prime)));
-                c = (byte) (maxval * (1-r_prime-k)/(1-k));
-                m = (byte) (maxval * (1-g_prime-k)/(1-k));
-                y = (byte) (maxval * (1-b_prime-k)/(1-k));
-                pixelvector[0] = c;
-                pixelvector[1] = m;
-                pixelvector[2] = y;
-                pixelvector[3] = (byte) (maxval*k);
+                k = (1-Math.max(r_prime,Math.max(g_prime,b_prime)));
+                c = (int) (maxval * (1-r_prime-k)/(1-k));
+                m = (int) (maxval * (1-g_prime-k)/(1-k));
+                y = (int) (maxval * (1-b_prime-k)/(1-k));
+                kint = (int) (maxval*k);
+                pixelvector[0] = (byte) c;
+                pixelvector[1] = (byte) m;
+                pixelvector[2] = (byte) y;
+                pixelvector[3] = (byte) kint;
                 newMat.put(i,j,pixelvector);
             }
         }
