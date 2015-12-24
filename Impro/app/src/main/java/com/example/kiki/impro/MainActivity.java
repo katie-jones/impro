@@ -3,7 +3,10 @@ package com.example.kiki.impro;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +17,7 @@ import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -21,12 +25,16 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
-public class MainActivity extends Activity implements MainFragment.MainInterface, LiveFragment.LiveFragmentInterface {
+import java.util.prefs.PreferenceChangeListener;
+
+public class MainActivity extends Activity implements MainFragment.MainInterface, LiveFragment.LiveFragmentInterface, SharedPreferences.OnSharedPreferenceChangeListener {
     private Fragment mStillFragment;
     private Fragment mLiveFragment;
+    private ColorbarFragment mColorbarFragment;
     static private String TAG = "MainActivity";
     private static final String TAG_LIVE_FRAGMENT = "live_fragment";
     private static final String TAG_STILL_FRAGMENT = "still_fragment";
+    private static final String TAG_COLORBAR_FRAGMENT = "colorbar_fragment";
     private static boolean stillActive;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -51,7 +59,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     }
     @Override
     public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        Log.e(TAG,"Restore");
+        Log.e(TAG, "Restore");
         super.onRestoreInstanceState(savedInstanceState);
     }
     @Override
@@ -65,10 +73,15 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         PreferenceManager.setDefaultValues(this, R.xml.menufragment, false);
+
+        mColorbarFragment = (ColorbarFragment) getFragmentManager().findFragmentById(R.id.colorbarfragment);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     public void onButtonClicked(View v) {
-        Log.e(TAG,"button clicked");
+        Log.e(TAG, "button clicked");
         // Exchange current fragment with the other one.
         if (mLiveFragment.isVisible()){
             LiveFragment frag = (LiveFragment) mLiveFragment;
@@ -119,5 +132,16 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         transaction.replace(mLiveFragment.getId(), mStillFragment, TAG_STILL_FRAGMENT);
         stillActive=true;
         transaction.commit();
+    }
+
+    // method for menu fragment
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        Log.e(TAG, "onSharedPreferenceChange");
+
+        if (key.equals("p_color_key")) {
+            int type = Integer.parseInt(prefs.getString("p_color_key", "0"));
+            mColorbarFragment.setColorbarType(type);
+        }
     }
 }

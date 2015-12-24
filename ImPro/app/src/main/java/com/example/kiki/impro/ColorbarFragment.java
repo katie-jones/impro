@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 import org.opencv.core.Range;
@@ -23,7 +24,10 @@ import java.util.Set;
 public class ColorbarFragment extends Fragment {
     static private String TAG="ColorbarFragment";
     private View mView;
-    private RangeSeekBar<Integer> mSeekBar1,mSeekBar2,mSeekBar3;
+    private RangeSeekBar<Integer> mSeekBar1,mSeekBar2,mSeekBar3,mSeekBar4;
+    private TextView mText1,mText2,mText3,mText4;
+    private final int HMaxValue = 180;
+    private final int RGBMaxValue = 255;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,19 +35,32 @@ public class ColorbarFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         mView = inflater.inflate(R.layout.colorbarfragment, container, false);
 
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
+
         mSeekBar1 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar1);
         mSeekBar2 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar2);
         mSeekBar3 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar3);
+        mSeekBar4 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar4);
 
-//        SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mText1 = (TextView) mView.findViewById(R.id.colortext1);
+        mText2 = (TextView) mView.findViewById(R.id.colortext2);
+        mText3 = (TextView) mView.findViewById(R.id.colortext3);
+        mText4 = (TextView) mView.findViewById(R.id.colortext4);
+
+
 
         mSeekBar1.setSelectedMinValue(mPrefs.getInt("lower1", 0));
         mSeekBar2.setSelectedMinValue(mPrefs.getInt("lower2", 0));
         mSeekBar3.setSelectedMinValue(mPrefs.getInt("lower3", 0));
-        mSeekBar1.setSelectedMaxValue(mPrefs.getInt("upper1", 255));
+        mSeekBar4.setSelectedMinValue(mPrefs.getInt("lower4", 0));
+
+        mSeekBar1.setSelectedMaxValue(mPrefs.getInt("upper2", 255));
         mSeekBar2.setSelectedMaxValue(mPrefs.getInt("upper2", 255));
         mSeekBar3.setSelectedMaxValue(mPrefs.getInt("upper3", 255));
+        mSeekBar4.setSelectedMaxValue(mPrefs.getInt("upper4", 255));
+
+        setColorbarType(type);
 
 
         RangeSeekBar.OnRangeSeekBarChangeListener<Integer> listener = new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
@@ -69,6 +86,11 @@ public class ColorbarFragment extends Fragment {
                     mEditor.putInt("lower3", minValue);
                     mEditor.putInt("upper3", maxValue);
                 }
+                if (mbar.getId() == mSeekBar4.getId()) {
+                    Log.e(TAG,"minValue4: "+ String.valueOf(minValue));
+                    mEditor.putInt("lower4", minValue);
+                    mEditor.putInt("upper4", maxValue);
+                }
                 mEditor.apply();
                 // TESTING: check if shared preferences have been updated correctly
                 //SharedPreferences mPrefs2 = getActivity().getSharedPreferences("my",Context.MODE_PRIVATE);
@@ -83,6 +105,45 @@ public class ColorbarFragment extends Fragment {
         mSeekBar3.setOnRangeSeekBarChangeListener(listener);
 
         return mView;
+    }
+
+    // Change colorbars based on chosen color scheme
+    public void setColorbarType (int type) {
+        // use RGB limits and no 4th colorbar by default
+        mSeekBar1.setRangeValues(0, RGBMaxValue);
+        mSeekBar4.setVisibility(View.INVISIBLE);
+
+        switch (type) {
+            case 0: // RGB
+                mText1.setText("R");
+                mText2.setText("G");
+                mText3.setText("B");
+                mText4.setText("");
+                break;
+            case 1: // HSV
+                mText1.setText("H");
+                mText2.setText("S");
+                mText3.setText("V");
+                mText4.setText("");
+
+                // change upper limit for seekbar 1 if HSV is chosen (H goes to 180 only)
+                mSeekBar1.setRangeValues(0, HMaxValue);
+                if (mSeekBar1.getSelectedMaxValue() > HMaxValue)
+                    mSeekBar1.setSelectedMaxValue(HMaxValue);
+                break;
+            case 2: // CMYK
+                mText1.setText("C");
+                mText2.setText("M");
+                mText3.setText("Y");
+                mText4.setText("K");
+
+                // Set 4th colorbar to enabled if CMYK type is chosen
+                mSeekBar4.setVisibility(View.VISIBLE);
+                break;
+            default:
+                break;
+        }
+
     }
 
 //    @Override

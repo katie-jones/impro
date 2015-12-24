@@ -112,6 +112,7 @@ public class StillFragment extends Fragment {
         }
 
         boolean inrange;
+        int this_pix;
 
         Utils.bitmapToMat(rotatedBitmap, mMat);
         //List<Mat> planes = new ArrayList<Mat>();
@@ -124,7 +125,13 @@ public class StillFragment extends Fragment {
                 inrange=true;
                 colorMat.get(i, j, pixelvector);
                 for (int k = 0; k<depth; k++) {
-                    if ((pixelvector[k] > upper_array[k]) || pixelvector[k] < lower_array[k]) {
+                    // convert signed byte in unsigned integer
+                    this_pix = ((int) pixelvector[k]) & 0xFF;
+                    if ((j==0) && (i==0)) {
+                        Log.e(TAG, "pixel " + String.valueOf(pixelvector[k]));
+                        Log.e(TAG, "pixel int " + String.valueOf(this_pix));
+                    }
+                    if ((this_pix > upper_array[k]) || this_pix < lower_array[k]) {
                         inrange=false;
                         break;
                     }
@@ -133,7 +140,6 @@ public class StillFragment extends Fragment {
                     mMat.put(i, j, zeros);
                     //Log.e(TAG,"not in range");
                 }
-
             }
         }
         //for (int k = 0; k < planes.size(); k++) {
