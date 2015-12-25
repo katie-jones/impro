@@ -29,6 +29,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -863,15 +864,47 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
+
+    private static class ImageSaverExternal implements Runnable {
+
+        // Checks if external storage is available for read and write
+        public boolean isExternalStorageWritable() {
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state)) {
+                return true;
+            }
+            return false;
+        }
+
+        // Checks if external storage is available to at least read
+        public boolean isExternalStorageReadable() {
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state) ||
+                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+                return true;
+            }
+            return false;
+        }
+
+        // Get file where picture can be stored
+        public File getAlbumStorageDir(String pictureName) {
+            // Get the directory for the user's public pictures directory.
+            File file = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES), pictureName);
+            if (!file.mkdirs()) {
+                Log.e(TAG, "Directory not created");
+            }
+            return file;
+        }
+
+
+    }
+
     private static class ImageSaver implements Runnable {
 
-        /**
-         * The JPEG image
-         */
+        //The JPEG image
         private final Image mImage;
-        /**
-         * The file we save the image into.
-         */
+        //The file we save the image into
         private final File mFile;
 
         public ImageSaver(Image image, File file) {
