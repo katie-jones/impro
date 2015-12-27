@@ -173,9 +173,10 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
 //            Log.e(TAG,"Surface texture size changed");
-//            Log.e(TAG,String.valueOf(width));
 //            Log.e(TAG,String.valueOf(height));
+//            Log.e(TAG,String.valueOf(width));
             texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+
             configureTransform(width, height);
         }
 
@@ -865,40 +866,40 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
 
-    private static class ImageSaverExternal implements Runnable {
-
-        // Checks if external storage is available for read and write
-        public boolean isExternalStorageWritable() {
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state)) {
-                return true;
-            }
-            return false;
-        }
-
-        // Checks if external storage is available to at least read
-        public boolean isExternalStorageReadable() {
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state) ||
-                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-                return true;
-            }
-            return false;
-        }
-
-        // Get file where picture can be stored
-        public File getAlbumStorageDir(String pictureName) {
-            // Get the directory for the user's public pictures directory.
-            File file = new File(Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_PICTURES), pictureName);
-            if (!file.mkdirs()) {
-                Log.e(TAG, "Directory not created");
-            }
-            return file;
-        }
-
-
-    }
+//    private static class ImageSaverExternal implements Runnable {
+//
+//        // Checks if external storage is available for read and write
+//        public boolean isExternalStorageWritable() {
+//            String state = Environment.getExternalStorageState();
+//            if (Environment.MEDIA_MOUNTED.equals(state)) {
+//                return true;
+//            }
+//            return false;
+//        }
+//
+//        // Checks if external storage is available to at least read
+//        public boolean isExternalStorageReadable() {
+//            String state = Environment.getExternalStorageState();
+//            if (Environment.MEDIA_MOUNTED.equals(state) ||
+//                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+//                return true;
+//            }
+//            return false;
+//        }
+//
+//        // Get file where picture can be stored
+//        public File getAlbumStorageDir(String pictureName) {
+//            // Get the directory for the user's public pictures directory.
+//            File file = new File(Environment.getExternalStoragePublicDirectory(
+//                    Environment.DIRECTORY_PICTURES), pictureName);
+//            if (!file.mkdirs()) {
+//                Log.e(TAG, "Directory not created");
+//            }
+//            return file;
+//        }
+//
+//
+//    }
 
     private static class ImageSaver implements Runnable {
 

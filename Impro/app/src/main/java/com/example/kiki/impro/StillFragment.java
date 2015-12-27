@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -46,17 +48,40 @@ public class StillFragment extends Fragment {
         if (mBitmap!=null) {
             Log.e(TAG,"Bitmap loaded");
         }
-        if ((mBitmap!=null) && (mImageView!=null)) {
-            if (savedInstanceState==null){
-                imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
-              }
-          applyFilter();
-            //Log.e(TAG, "Filter applied");
-//            mImageView.setImageBitmap(mBitmap);
-            mImageView.setImageBitmap(rotatedBitmap);
-        }
+
+
+        // use global layout listener to find when view sizes have been assigned so we can determine size of image view and apply appropriate transformation
+        ViewTreeObserver vto = mImageView.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            @Override
+            public void onGlobalLayout() {
+//                LayerDrawable ld = (LayerDrawable)tv.getBackground();
+//                ld.setLayerInset(1, 0, tv.getHeight() / 2, 0, 0);
+                Log.e(TAG,"Image view size: " + String.valueOf(mImageView.getWidth()) + " x " + String.valueOf(mImageView.getHeight()));
+                ViewTreeObserver obs = mImageView.getViewTreeObserver();
+                obs.removeOnGlobalLayoutListener(this);
+
+                imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
+                mImageView.setImageBitmap(mBitmap);
+
+            }
+
+        });
+
+
+//        if ((mBitmap!=null) && (mImageView!=null)) {
+//            if (savedInstanceState==null){
+////                imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
+//              }
+//          applyFilter();
+//            //Log.e(TAG, "Filter applied");
+////            mImageView.setImageBitmap(mBitmap);
+//            mImageView.setImageBitmap(rotatedBitmap);
+//        }
         return mView;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -161,37 +186,76 @@ public class StillFragment extends Fragment {
         //Log.e(TAG,String.valueOf(rotation));
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mBitmap.getHeight(), mBitmap.getWidth());
-        RectF bufferRect2 = new RectF(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+        RectF bufferRect;
+
+        if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
+            bufferRect = new RectF(0, 0, mBitmap.getHeight(), mBitmap.getWidth());
+        else
+            bufferRect = new RectF(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
 
-        Log.e(TAG, String.valueOf(rotation));
-
-        if (Surface.ROTATION_0 == rotation || Surface.ROTATION_180 == rotation) {
-            bufferRect2.offset(centerX - bufferRect2.centerX(),centerY - bufferRect2.centerY());
-            matrix.setRectToRect(viewRect, bufferRect2, Matrix.ScaleToFit.FILL);
-            float scale = Math.max(
-                    (float) viewHeight / mBitmap.getHeight(),
-                    (float) viewWidth / mBitmap.getWidth());
-            matrix.postScale(scale, scale, centerX, centerY);
-        }
-        // rotation = 0
-        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
-            float scale = Math.max(
-                    (float) viewHeight / mBitmap.getHeight(),
-                    (float) viewWidth / mBitmap.getWidth());
-            matrix.postScale(scale, scale, centerX, centerY);
-            // 90: rotation 1, 270: rotation 3, 180: 2, 0: 0
-
-        }
-        matrix.postRotate(90*(1-rotation), centerX, centerY);
+//        Log.e(TAG, String.valueOf(rotation));
+//
+//        if (Surface.ROTATION_0 == rotation || Surface.ROTATION_180 == rotation) {
+//            bufferRect2.offset(centerX - bufferRect2.centerX(),centerY - bufferRect2.centerY());
+//            matrix.setRectToRect(viewRect, bufferRect2, Matrix.ScaleToFit.FILL);
+//            float scale = Math.max(
+//                    (float) viewHeight / mBitmap.getHeight(),
+//                    (float) viewWidth / mBitmap.getWidth());
+//            matrix.postScale(scale, scale, centerX, centerY);
+//        }
+//        // rotation = 0
+//        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+//            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+//            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
+//            float scale = Math.max(
+//                    (float) viewHeight / mBitmap.getHeight(),
+//                    (float) viewWidth / mBitmap.getWidth());
+//            matrix.postScale(scale, scale, centerX, centerY);
+//            // 90: rotation 1, 270: rotation 3, 180: 2, 0: 0
+//
+//        }
+//        matrix.postRotate(90*(1-rotation), centerX, centerY);
 //        Matrix matrix2 = new Matrix();
 //        matrix2.postRotate(90);
-        rotatedBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
+//        rotatedBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
        // mImageView.setImageMatrix(matrix2);
+
+        // TESTING
+        rotatedBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), new Matrix(), true);
+
+        // new rotation matrix
+        Matrix matrix2 = new Matrix();
+
+        Log.e(TAG, "Bitmap size " + String.valueOf(mBitmap.getHeight()) + " x " + String.valueOf(mBitmap.getWidth()));
+        Log.e(TAG, "view size " + String.valueOf(viewHeight + " x " + viewWidth));
+
+//        bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+////        bufferRect.offset(bufferRect.centerY()-centerY, bufferRect.centerX()-centerX);
+//        matrix2.setRectToRect(bufferRect, viewRect, Matrix.ScaleToFit.START);
+////        matrix2.postTranslate((centerX - bufferRect.centerX()) / 2.0f, (centerY - bufferRect.centerY()) / 2.0f);
+//
+//        Matrix matrix3 = new Matrix();
+//        matrix3.setTranslate((centerX - bufferRect.centerX()) / 2.0f, (centerY - bufferRect.centerY()) / 2.0f);
+//        matrix3.postRotate(90,centerX,centerY);
+//
+//        matrix2.postConcat(matrix3);
+
+        float scale = Math.min(
+                (float) viewHeight / bufferRect.height(),
+                (float) viewWidth / bufferRect.width());
+//                    (float) viewHeight / mBitmap.getWidth(),
+//                    (float) viewWidth / mBitmap.getHeight());
+
+        matrix2.setScale(scale, scale, centerX, centerY);
+        matrix2.preTranslate((centerX - bufferRect.centerY()), (centerY - bufferRect.centerX()));
+        matrix2.postRotate(90*(1-rotation),centerX,centerY);
+
+
+
+        mImageView.setImageMatrix(matrix2);
     }
 
     public void onRotated() {
