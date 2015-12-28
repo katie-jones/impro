@@ -64,9 +64,10 @@ public class StillFragment extends Fragment {
 
         // Apply filter only if a new image has been taken
         if (savedInstanceState == null) {
+            // initialize filtered image and then apply filter
+            filteredBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), new Matrix(), true);
             applyFilter();
         }
-
         mImageView.setImageBitmap(filteredBitmap);
 
 
@@ -86,8 +87,6 @@ public class StillFragment extends Fragment {
         int width = mBitmap.getWidth();
         int height = mBitmap.getHeight();
         int depth = 3;
-
-        filteredBitmap = Bitmap.createBitmap(mBitmap, 0,0, width, height, new Matrix(), true);
 
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
