@@ -1,8 +1,13 @@
 package com.example.kiki.impro;
 
+import android.app.Activity;
+import android.app.Application;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -10,6 +15,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -66,9 +72,13 @@ public class StillFragment extends Fragment {
         if (savedInstanceState == null) {
             // initialize filtered image and then apply filter
             filteredBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), new Matrix(), true);
-            applyFilter();
+            CommonResources.filteredBitmap = filteredBitmap;
+
+            // Create new intent to filter image
+            Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
+            getActivity().startService(mServiceIntent);
+
         }
-        mImageView.setImageBitmap(filteredBitmap);
 
 
         return mView;
@@ -81,98 +91,45 @@ public class StillFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        // The filter's action is BROADCAST_ACTION
+        IntentFilter mStatusIntentFilter = new IntentFilter(
+                CommonResources.BROADCAST_ACTION);
+
+        // Adds a data filter for the HTTP scheme
+//        mStatusIntentFilter.addDataScheme("http");
+
+
+        // Registers the FilteringBroadcastReceiver and its intent filters
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mReceiver,
+                mStatusIntentFilter);
+
+
     }
 
-    private void applyFilter() {
-        int width = mBitmap.getWidth();
-        int height = mBitmap.getHeight();
-        int depth = 3;
 
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
-
-        Mat mMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
-        Mat colorMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
-        Utils.bitmapToMat(filteredBitmap, mMat);
-
-        byte[] pixelvector = new byte[0];
-        byte[] zeros = new byte[0];
-
-        switch (type) {
-            case 0: // RGB
-                Log.e(TAG,"RGB");
-                depth = 3;
-                pixelvector = new byte[depth+1];
-                zeros = new byte[depth+1];
-                colorMat = mMat;
-                break;
-            case 1: // HSV
-                Log.e(TAG,"HSV");
-                Imgproc.cvtColor(mMat, colorMat, Imgproc.COLOR_RGB2HSV);
-                depth = 3;
-                pixelvector = new byte[depth];
-                zeros = new byte[depth+1];
-                break;
-            case 2: // CMYK
-                Log.e(TAG,"CMYK");
-                cvt2CMYK(mMat, colorMat);
-                depth = 4;
-                pixelvector = new byte[depth];
-                zeros = new byte[depth];
-        }
-
-        int[] lower_array = new int[depth];
-        int[] upper_array = new int[depth];
-        for (int k=0; k<depth;k++) {
-            lower_array[k] = mPrefs.getInt("lower"+String.valueOf(k+1), 0);
-            Log.e(TAG,"lower"+String.valueOf(lower_array[k]));
-            upper_array[k] = mPrefs.getInt("upper"+String.valueOf(k+1), 255);
-            Log.e(TAG,"upper"+String.valueOf(upper_array[k]));
-        }
-
-        boolean inrange;
-        int this_pix;
-
-        Utils.bitmapToMat(filteredBitmap, mMat);
-        //List<Mat> planes = new ArrayList<Mat>();
-        //Core.split(mMat, planes);
-        Log.e(TAG, "height" + String.valueOf(mMat.height()));
-        //Log.e(TAG, "pixel" + String.valueOf(mMat.get(0, 0, pixelvector)));
-        Log.e(TAG,"depth"+String.valueOf(mMat.type()));
-        for (int i = 0; i<mMat.height(); i++) {
-            for (int j = 0; j<mMat.width(); j++) {
-                inrange=true;
-                colorMat.get(i, j, pixelvector);
-                for (int k = 0; k<depth; k++) {
-                    // convert signed byte in unsigned integer
-                    this_pix = ((int) pixelvector[k]) & 0xFF;
-                    if ((j==0) && (i==0)) {
-                        Log.e(TAG, "pixel " + String.valueOf(pixelvector[k]));
-                        Log.e(TAG, "pixel int " + String.valueOf(this_pix));
-                    }
-                    if ((this_pix > upper_array[k]) || this_pix < lower_array[k]) {
-                        inrange=false;
-                        break;
-                    }
-                }
-                if (!inrange) {
-                    mMat.put(i, j, zeros);
-                }
-            }
-        }
-        //for (int k = 0; k < planes.size(); k++) {
-
-            // all pixels above "upper" set to 0, other pixels untouched.
-          //  Imgproc.threshold(planes.get(k), planes.get(k), upper, 0, Imgproc.THRESH_TOZERO_INV);
-            // all pixels below "lower" set to 0, other pixels set to 1.
-            // Imgproc.threshold(mMat, mMat, lower, 255, Imgproc.THRESH_BINARY);
-          //  Imgproc.threshold(planes.get(k), planes.get(k), lower, 0, Imgproc.THRESH_TOZERO);
-        //}
-
-        //Core.merge(planes, mMat);
-
-        Utils.matToBitmap(mMat, filteredBitmap);
+    @Override
+    public void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
+        super.onDestroy();
     }
+
+
+    // Instantiates a new FilteringBroadcastReceiver
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e(TAG,"Broadcast receiver called");
+            // Update filtered bitmap and set as content of image view
+            filteredBitmap = CommonResources.filteredBitmap;
+            mImageView.setImageBitmap(filteredBitmap);
+        }
+    };
+
+
 
 
     private void imageViewTransform(int viewWidth, int viewHeight) {
@@ -212,32 +169,7 @@ public class StillFragment extends Fragment {
     }
 
 
-    private void cvt2CMYK(Mat mMat, Mat newMat) {
-        final int depth = 4;
-        byte[] pixelvector = new byte[depth];
-        float r_prime, g_prime, b_prime, k;
-        int c,m,y,kint;
-        final float maxval = 255;
 
-        for (int i = 0; i<mMat.height(); i++) {
-            for (int j = 0; j<mMat.width(); j++) {
-                mMat.get(i,j,pixelvector);
-                r_prime = (float)pixelvector[0]/maxval;
-                g_prime = (float)pixelvector[1]/maxval;
-                b_prime = (float)pixelvector[2]/maxval;
-                k = (1-Math.max(r_prime,Math.max(g_prime,b_prime)));
-                c = (int) (maxval * (1-r_prime-k)/(1-k));
-                m = (int) (maxval * (1-g_prime-k)/(1-k));
-                y = (int) (maxval * (1-b_prime-k)/(1-k));
-                kint = (int) (maxval*k);
-                pixelvector[0] = (byte) c;
-                pixelvector[1] = (byte) m;
-                pixelvector[2] = (byte) y;
-                pixelvector[3] = (byte) kint;
-                newMat.put(i,j,pixelvector);
-            }
-        }
-    }
 
     private void cvt2RGB(Mat mMat) {
         final int depth = 3;
@@ -264,5 +196,6 @@ public class StillFragment extends Fragment {
             }
         }
     }
+
 
 }
