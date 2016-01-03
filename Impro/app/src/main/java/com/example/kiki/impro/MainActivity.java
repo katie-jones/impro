@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         else {
             if (stillActive) {
                 StillFragment frag = (StillFragment) mStillFragment;
-                frag.onRotated();
+//                frag.onRotated();
             }
         }
     }

@@ -1,8 +1,13 @@
 package com.example.kiki.impro;
 
+import android.app.Activity;
+import android.app.Application;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -10,6 +15,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -32,8 +38,8 @@ import java.util.List;
  */
 public class StillFragment extends Fragment {
     private View mView; // View corresponding to fragment -- inflated xml file
-    private Bitmap mBitmap;
-    private Bitmap rotatedBitmap;
+    private Bitmap mBitmap; // original, unmodified image
+    private Bitmap filteredBitmap; // filtered image
     private ImageView mImageView;
     private final static String TAG = "StillFragment";
 
@@ -41,256 +47,129 @@ public class StillFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Log.e(TAG,"still on create view");
         mView = inflater.inflate(R.layout.stillfragment, container, false);
         mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
         mBitmap = CommonResources.bitmap;
-        if (mBitmap!=null) {
-            Log.e(TAG,"Bitmap loaded");
-        }
 
-
-        // use global layout listener to find when view sizes have been assigned so we can determine size of image view and apply appropriate transformation
+        // use global layout listener to find when view sizes have been assigned so we can
+        // determine size of image view and apply appropriate transformation
         ViewTreeObserver vto = mImageView.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             @Override
             public void onGlobalLayout() {
-//                LayerDrawable ld = (LayerDrawable)tv.getBackground();
-//                ld.setLayerInset(1, 0, tv.getHeight() / 2, 0, 0);
-                Log.e(TAG,"Image view size: " + String.valueOf(mImageView.getWidth()) + " x " + String.valueOf(mImageView.getHeight()));
+//                    Log.e(TAG, "Image view size: " + String.valueOf(mImageView.getWidth()) + " x " + String.valueOf(mImageView.getHeight()));
                 ViewTreeObserver obs = mImageView.getViewTreeObserver();
                 obs.removeOnGlobalLayoutListener(this);
 
                 imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
-                mImageView.setImageBitmap(mBitmap);
 
             }
 
         });
 
+        // Apply filter only if a new image has been taken
+        if (savedInstanceState == null) {
+            // initialize filtered image and then apply filter
+            filteredBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), new Matrix(), true);
+            CommonResources.filteredBitmap = filteredBitmap;
 
-//        if ((mBitmap!=null) && (mImageView!=null)) {
-//            if (savedInstanceState==null){
-////                imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
-//              }
-//          applyFilter();
-//            //Log.e(TAG, "Filter applied");
-////            mImageView.setImageBitmap(mBitmap);
-//            mImageView.setImageBitmap(rotatedBitmap);
-//        }
+            // Create new intent to filter image
+            Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
+            getActivity().startService(mServiceIntent);
+
+        }
+
+
         return mView;
     }
+
+
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        // The filter's action is BROADCAST_ACTION
+        IntentFilter mStatusIntentFilter = new IntentFilter(
+                CommonResources.BROADCAST_ACTION);
+
+        // Adds a data filter for the HTTP scheme
+//        mStatusIntentFilter.addDataScheme("http");
+
+
+        // Registers the FilteringBroadcastReceiver and its intent filters
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mReceiver,
+                mStatusIntentFilter);
+
+
     }
 
-    private void applyFilter() {
-        int width = rotatedBitmap.getWidth();
-        int height = rotatedBitmap.getHeight();
-        int depth = 3;
 
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
-
-        Mat mMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
-        Mat colorMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
-        Utils.bitmapToMat(rotatedBitmap, mMat);
-
-        byte[] pixelvector = new byte[0];
-        byte[] zeros = new byte[0];
-
-        switch (type) {
-            case 0: // RGB
-                Log.e(TAG,"RGB");
-                depth = 3;
-                pixelvector = new byte[depth+1];
-                zeros = new byte[depth+1];
-                colorMat = mMat;
-                break;
-            case 1: // HSV
-                Log.e(TAG,"HSV");
-                Imgproc.cvtColor(mMat, colorMat, Imgproc.COLOR_RGB2HSV);
-                depth = 3;
-                pixelvector = new byte[depth];
-                zeros = new byte[depth+1];
-                break;
-            case 2: // CMYK
-                Log.e(TAG,"CMYK");
-                cvt2CMYK(mMat, colorMat);
-                depth = 4;
-                pixelvector = new byte[depth];
-                zeros = new byte[depth];
-        }
-
-        int[] lower_array = new int[depth];
-        int[] upper_array = new int[depth];
-        for (int k=0; k<depth;k++) {
-            lower_array[k] = mPrefs.getInt("lower"+String.valueOf(k+1), 0);
-            Log.e(TAG,"lower"+String.valueOf(lower_array[k]));
-            upper_array[k] = mPrefs.getInt("upper"+String.valueOf(k+1), 255);
-            Log.e(TAG,"upper"+String.valueOf(upper_array[k]));
-        }
-
-        boolean inrange;
-        int this_pix;
-
-        Utils.bitmapToMat(rotatedBitmap, mMat);
-        //List<Mat> planes = new ArrayList<Mat>();
-        //Core.split(mMat, planes);
-        Log.e(TAG, "height" + String.valueOf(mMat.height()));
-        //Log.e(TAG, "pixel" + String.valueOf(mMat.get(0, 0, pixelvector)));
-        Log.e(TAG,"depth"+String.valueOf(mMat.type()));
-        for (int i = 0; i<mMat.height(); i++) {
-            for (int j = 0; j<mMat.width(); j++) {
-                inrange=true;
-                colorMat.get(i, j, pixelvector);
-                for (int k = 0; k<depth; k++) {
-                    // convert signed byte in unsigned integer
-                    this_pix = ((int) pixelvector[k]) & 0xFF;
-                    if ((j==0) && (i==0)) {
-                        Log.e(TAG, "pixel " + String.valueOf(pixelvector[k]));
-                        Log.e(TAG, "pixel int " + String.valueOf(this_pix));
-                    }
-                    if ((this_pix > upper_array[k]) || this_pix < lower_array[k]) {
-                        inrange=false;
-                        break;
-                    }
-                }
-                if (!inrange) {
-                    mMat.put(i, j, zeros);
-                }
-            }
-        }
-        //for (int k = 0; k < planes.size(); k++) {
-
-            // all pixels above "upper" set to 0, other pixels untouched.
-          //  Imgproc.threshold(planes.get(k), planes.get(k), upper, 0, Imgproc.THRESH_TOZERO_INV);
-            // all pixels below "lower" set to 0, other pixels set to 1.
-            // Imgproc.threshold(mMat, mMat, lower, 255, Imgproc.THRESH_BINARY);
-          //  Imgproc.threshold(planes.get(k), planes.get(k), lower, 0, Imgproc.THRESH_TOZERO);
-        //}
-
-        //Core.merge(planes, mMat);
-
-        Utils.matToBitmap(mMat, rotatedBitmap);
+    @Override
+    public void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
+        super.onDestroy();
     }
+
+
+    // Instantiates a new FilteringBroadcastReceiver
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e(TAG,"Broadcast receiver called");
+            // Update filtered bitmap and set as content of image view
+            filteredBitmap = CommonResources.filteredBitmap;
+            mImageView.setImageBitmap(filteredBitmap);
+        }
+    };
+
+
 
 
     private void imageViewTransform(int viewWidth, int viewHeight) {
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
-        //Log.e(TAG,String.valueOf(rotation));
-        Matrix matrix = new Matrix();
-        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect;
 
-        if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
-            bufferRect = new RectF(0, 0, mBitmap.getHeight(), mBitmap.getWidth());
-        else
-            bufferRect = new RectF(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+        Matrix matrix = new Matrix(); // transformation matrix
+        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight); // view rectangle
+        RectF bufferRect; // image rectangle
+
+        bufferRect = new RectF(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
 
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
 
-//        Log.e(TAG, String.valueOf(rotation));
-//
-//        if (Surface.ROTATION_0 == rotation || Surface.ROTATION_180 == rotation) {
-//            bufferRect2.offset(centerX - bufferRect2.centerX(),centerY - bufferRect2.centerY());
-//            matrix.setRectToRect(viewRect, bufferRect2, Matrix.ScaleToFit.FILL);
-//            float scale = Math.max(
-//                    (float) viewHeight / mBitmap.getHeight(),
-//                    (float) viewWidth / mBitmap.getWidth());
-//            matrix.postScale(scale, scale, centerX, centerY);
-//        }
-//        // rotation = 0
-//        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-//            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-//            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
-//            float scale = Math.max(
-//                    (float) viewHeight / mBitmap.getHeight(),
-//                    (float) viewWidth / mBitmap.getWidth());
-//            matrix.postScale(scale, scale, centerX, centerY);
-//            // 90: rotation 1, 270: rotation 3, 180: 2, 0: 0
-//
-//        }
-//        matrix.postRotate(90*(1-rotation), centerX, centerY);
-//        Matrix matrix2 = new Matrix();
-//        matrix2.postRotate(90);
-//        rotatedBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
-       // mImageView.setImageMatrix(matrix2);
 
-        // TESTING
-        rotatedBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), new Matrix(), true);
+//        Log.e(TAG, "Bitmap size " + String.valueOf(mBitmap.getHeight()) + " x " + String.valueOf(mBitmap.getWidth()));
+//        Log.e(TAG, "view size " + String.valueOf(viewHeight + " x " + viewWidth));
 
-        // new rotation matrix
-        Matrix matrix2 = new Matrix();
-
-        Log.e(TAG, "Bitmap size " + String.valueOf(mBitmap.getHeight()) + " x " + String.valueOf(mBitmap.getWidth()));
-        Log.e(TAG, "view size " + String.valueOf(viewHeight + " x " + viewWidth));
-
-//        bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-////        bufferRect.offset(bufferRect.centerY()-centerY, bufferRect.centerX()-centerX);
-//        matrix2.setRectToRect(bufferRect, viewRect, Matrix.ScaleToFit.START);
-////        matrix2.postTranslate((centerX - bufferRect.centerX()) / 2.0f, (centerY - bufferRect.centerY()) / 2.0f);
-//
-//        Matrix matrix3 = new Matrix();
-//        matrix3.setTranslate((centerX - bufferRect.centerX()) / 2.0f, (centerY - bufferRect.centerY()) / 2.0f);
-//        matrix3.postRotate(90,centerX,centerY);
-//
-//        matrix2.postConcat(matrix3);
-
-        float scale = Math.min(
-                (float) viewHeight / bufferRect.height(),
-                (float) viewWidth / bufferRect.width());
-//                    (float) viewHeight / mBitmap.getWidth(),
-//                    (float) viewWidth / mBitmap.getHeight());
-
-        matrix2.setScale(scale, scale, centerX, centerY);
-        matrix2.preTranslate((centerX - bufferRect.centerY()), (centerY - bufferRect.centerX()));
-        matrix2.postRotate(90*(1-rotation),centerX,centerY);
-
-
-
-        mImageView.setImageMatrix(matrix2);
-    }
-
-    public void onRotated() {
-        Log.e(TAG,"on rotated");
-        //rotatedBitmap=mBitmap;
-//        imageViewTransform(mImageView.getMaxWidth(), mImageView.getMaxHeight());
-//        mImageView.setImageBitmap(rotatedBitmap);
-    }
-
-    private void cvt2CMYK(Mat mMat, Mat newMat) {
-        final int depth = 4;
-        byte[] pixelvector = new byte[depth];
-        float r_prime, g_prime, b_prime, k;
-        int c,m,y,kint;
-        final float maxval = 255;
-
-        for (int i = 0; i<mMat.height(); i++) {
-            for (int j = 0; j<mMat.width(); j++) {
-                mMat.get(i,j,pixelvector);
-                r_prime = (float)pixelvector[0]/maxval;
-                g_prime = (float)pixelvector[1]/maxval;
-                b_prime = (float)pixelvector[2]/maxval;
-                k = (1-Math.max(r_prime,Math.max(g_prime,b_prime)));
-                c = (int) (maxval * (1-r_prime-k)/(1-k));
-                m = (int) (maxval * (1-g_prime-k)/(1-k));
-                y = (int) (maxval * (1-b_prime-k)/(1-k));
-                kint = (int) (maxval*k);
-                pixelvector[0] = (byte) c;
-                pixelvector[1] = (byte) m;
-                pixelvector[2] = (byte) y;
-                pixelvector[3] = (byte) kint;
-                newMat.put(i,j,pixelvector);
-            }
+        float scale;
+        if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+            scale = Math.min(
+                    (float) viewHeight / bufferRect.width(),
+                    (float) viewWidth / bufferRect.height());
         }
+
+        else {
+            scale = Math.min(
+                    (float) viewHeight / bufferRect.height(),
+                    (float) viewWidth / bufferRect.width());
+        }
+
+        matrix.setScale(scale, scale, centerX, centerY);
+        matrix.preTranslate((centerX - bufferRect.centerX()), (centerY - bufferRect.centerY()));
+        matrix.postRotate(90 * (1 - rotation), centerX, centerY);
+
+        mImageView.setImageMatrix(matrix);
     }
+
+
+
 
     private void cvt2RGB(Mat mMat) {
         final int depth = 3;
@@ -317,5 +196,6 @@ public class StillFragment extends Fragment {
             }
         }
     }
+
 
 }
