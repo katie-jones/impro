@@ -30,4 +30,10 @@
 
     <string name="colorbar">Filter ranges</string>
 
+    <string name="filenamePickerTitle">Choose filename</string>
+    <string name="filenameHint">filename</string>
+
+    <string name="saveImage">Save filtered image</string>
+    <string name="saveImageSummary">Save filtered image to internal storage</string>
+
 </resources>
