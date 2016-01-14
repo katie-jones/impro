@@ -13,7 +13,11 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.LayerDrawable;
+import android.media.Image;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -23,6 +27,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -30,6 +36,10 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,6 +136,24 @@ public class StillFragment extends Fragment {
             // Update filtered bitmap and set as content of image view
             filteredBitmap = CommonResources.filteredBitmap;
             mImageView.setImageBitmap(filteredBitmap);
+
+            // Make new file in internal storage
+            File file = new File(context.getFilesDir(),"filtered.png");
+
+            // make a new image saver and run it
+            ImageSaverExternal mImageSaver = new ImageSaverExternal(filteredBitmap,file);
+            mImageSaver.run();
+
+            // set file world readable
+            file.setReadable(true, false);
+
+            // alert media scanner of new image file
+            MediaScannerConnection.scanFile(context,new String[] {file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+                public void onScanCompleted(String path, Uri uri) {
+                    Log.i(TAG,"Scanned " + path + ":");
+                    Log.i(TAG,"uri=" + uri);
+                }
+            });
         }
     };
 
@@ -196,6 +224,130 @@ public class StillFragment extends Fragment {
             }
         }
     }
+
+
+
+    /**
+     * Saves a JPEG {@link Image} into the specified {@link File}.
+     */
+
+    private static class ImageSaverExternal implements Runnable {
+        //The JPEG image
+        private final Bitmap mImage;
+        //The file we save the image into
+        private final File mFile;
+
+        public ImageSaverExternal(Bitmap image, File file) {
+            mImage = image;
+            mFile = file;
+        }
+
+        @Override
+        public void run() {
+
+            if (isExternalStorageWritable()) {
+//                ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
+//                byte[] bytes = new byte[buffer.remaining()];
+//                buffer.get(bytes);
+                try {
+//                    File mFile = getAlbumStorageDir(mFilename);
+                    if (mFile.exists()) mFile.delete();
+                    mFile.createNewFile();
+                    Log.e(TAG,"Make file output stream");
+                    FileOutputStream output = new FileOutputStream(mFile);
+                    Log.e(TAG,"Start saving file");
+                    mImage.compress(Bitmap.CompressFormat.PNG,100,output);
+                    output.flush();
+                    Log.e(TAG, "Image saved! filename:" + mFile.getAbsolutePath());
+//                    output.write(bytes);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+//                    if (null != output) {
+//                        try {
+//                            output.close();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+                }
+            }
+
+            else {
+                Log.e(TAG,"external storage not writable");
+            }
+
+        }
+        // Checks if external storage is available for read and write
+        public boolean isExternalStorageWritable() {
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state)) {
+                return true;
+            }
+            return false;
+        }
+
+        // Checks if external storage is available to at least read
+        public boolean isExternalStorageReadable() {
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state) ||
+                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+                return true;
+            }
+            return false;
+        }
+
+        // Get file where picture can be stored
+        public File getAlbumStorageDir(String pictureName) {
+            // Get the directory for the user's public pictures directory.
+            File file = new File(Environment.DIRECTORY_PICTURES,pictureName);
+//                    Environment.getExternalStorageDirectory()+"/myfolder",pictureName);
+//                    Environment.getExternalStoragePublicDirectory(
+//                    Environment.DIRECTORY_PICTURES), pictureName);
+
+            if (!file.mkdirs()) {
+                Log.e(TAG, "Directory not created");
+            }
+            return file;
+        }
+
+
+    }
+
+//    private static class ImageSaver implements Runnable {
+//
+//        //The JPEG image
+//        private final Image mImage;
+//        //The file we save the image into
+//        private final File mFile;
+//
+//        public ImageSaver(Image image, File file) {
+//            mImage = image;
+//            mFile = file;
+//        }
+//
+//        @Override
+//        public void run() {
+//            ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
+//            byte[] bytes = new byte[buffer.remaining()];
+//            buffer.get(bytes);
+//            FileOutputStream output = null;
+//            try {
+//                output = new FileOutputStream(mFile);
+//                output.write(bytes);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } finally {
+//                mImage.close();
+//                if (null != output) {
+//                    try {
+//                        output.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }
 
 
 }

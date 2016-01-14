@@ -862,81 +862,9 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     }
 
 
-    /**
-     * Saves a JPEG {@link Image} into the specified {@link File}.
-     */
 
-//    private static class ImageSaverExternal implements Runnable {
-//
-//        // Checks if external storage is available for read and write
-//        public boolean isExternalStorageWritable() {
-//            String state = Environment.getExternalStorageState();
-//            if (Environment.MEDIA_MOUNTED.equals(state)) {
-//                return true;
-//            }
-//            return false;
-//        }
-//
-//        // Checks if external storage is available to at least read
-//        public boolean isExternalStorageReadable() {
-//            String state = Environment.getExternalStorageState();
-//            if (Environment.MEDIA_MOUNTED.equals(state) ||
-//                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-//                return true;
-//            }
-//            return false;
-//        }
-//
-//        // Get file where picture can be stored
-//        public File getAlbumStorageDir(String pictureName) {
-//            // Get the directory for the user's public pictures directory.
-//            File file = new File(Environment.getExternalStoragePublicDirectory(
-//                    Environment.DIRECTORY_PICTURES), pictureName);
-//            if (!file.mkdirs()) {
-//                Log.e(TAG, "Directory not created");
-//            }
-//            return file;
-//        }
-//
-//
-//    }
 
-    private static class ImageSaver implements Runnable {
 
-        //The JPEG image
-        private final Image mImage;
-        //The file we save the image into
-        private final File mFile;
-
-        public ImageSaver(Image image, File file) {
-            mImage = image;
-            mFile = file;
-        }
-
-        @Override
-        public void run() {
-            ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);
-            FileOutputStream output = null;
-            try {
-                output = new FileOutputStream(mFile);
-                output.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                mImage.close();
-                if (null != output) {
-                    try {
-                        output.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-    }
 
 
 
