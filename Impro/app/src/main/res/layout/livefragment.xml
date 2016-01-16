@@ -3,11 +3,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/button_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_back"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        />
+
     <com.example.kiki.impro.AutoFitTextureView
         android:id="@+id/texture"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+        android:layout_above="@id/button_back"
+        android:clickable="true"
+        android:onClick="onButtonClicked"
         />
+
+
 </RelativeLayout>

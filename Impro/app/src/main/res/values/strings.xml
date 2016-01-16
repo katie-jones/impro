@@ -35,5 +35,7 @@
 
     <string name="saveImage">Save filtered image</string>
     <string name="saveImageSummary">Save filtered image to internal storage</string>
-
+    <string name="button_saveorig">Save original image</string>
+    <string name="button_savefilt">Save filtered image</string>
+    <string name="button_back">Back</string>
 </resources>
