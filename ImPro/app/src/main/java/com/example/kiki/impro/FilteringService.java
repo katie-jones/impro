@@ -32,6 +32,8 @@ public class FilteringService extends IntentService {
     @Override
     protected void onHandleIntent(Intent workIntent) {
         Log.e(TAG,"Start filtering service");
+        // Start filtering from original bitmap
+//        filteredBitmap = CommonResources.bitmap;
         filteredBitmap = CommonResources.filteredBitmap;
         applyFilter();
         CommonResources.filteredBitmap = filteredBitmap;
@@ -56,8 +58,12 @@ public class FilteringService extends IntentService {
         int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
 
         Mat mMat = new Mat(height,width, CvType.CV_8UC4,new Scalar(0));
+        Mat mOrigMat = new Mat(height,width, CvType.CV_8UC4,new Scalar(0));
         Mat colorMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
-        Utils.bitmapToMat(filteredBitmap, mMat);
+        //Utils.bitmapToMat(filteredBitmap, mMat);
+        //TEST:
+        Utils.bitmapToMat(CommonResources.bitmap,mOrigMat);
+        mOrigMat.copyTo(mMat);
 
         byte[] pixelvector = new byte[0];
         byte[] zeros = new byte[0];
@@ -97,7 +103,9 @@ public class FilteringService extends IntentService {
         boolean inrange;
         int this_pix;
 
-        Utils.bitmapToMat(filteredBitmap, mMat);
+        //Utils.bitmapToMat(filteredBitmap, mMat);
+        //TEST:
+
         //List<Mat> planes = new ArrayList<Mat>();
         //Core.split(mMat, planes);
 //        Log.e(TAG, "height" + String.valueOf(mMat.height()));

@@ -2,6 +2,7 @@ package com.example.kiki.impro;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
@@ -97,6 +98,13 @@ public class ColorbarFragment extends Fragment {
                 SharedPreferences mPrefs2 = getActivity().getPreferences(Context.MODE_PRIVATE);
                 test =  mPrefs2.getInt("lower3", 0);
                 Log.e(TAG, "lower3:" + String.valueOf(test));
+
+                // Dynamically apply new filter to image if in Still mode.
+                StillFragment mFragment = (StillFragment)getFragmentManager().findFragmentByTag("still_fragment");
+                if (mFragment != null && mFragment.isVisible()) {
+                    Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
+                    getActivity().startService(mServiceIntent);
+                }
             }
         };
 
