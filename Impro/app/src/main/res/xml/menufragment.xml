@@ -10,6 +10,7 @@
     <ListPreference
         android:key="p_color_key"
         android:title="@string/p_color_title"
+        android:summary="@string/p_color_summ"
         android:dialogTitle="@string/p_color_dialog"
         android:entries="@array/p_color_entries"
         android:entryValues="@array/p_color_values"

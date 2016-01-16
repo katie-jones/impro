@@ -90,13 +90,16 @@ public class StillFragment extends Fragment {
             CommonResources.reducedBitmap = reducedBitmap;
             CommonResources.filteredBitmap = filteredBitmap;
 
+
             // Create new intent to filter image
             CommonResources.filtering_toast = Toast.makeText(getActivity(), "filtering...", Toast.LENGTH_LONG);
             CommonResources.filtering_toast.show();
             Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
             getActivity().startService(mServiceIntent);
         }
-
+        else {
+            mImageView.setImageBitmap(filteredBitmap);
+        }
 
         return mView;
     }
