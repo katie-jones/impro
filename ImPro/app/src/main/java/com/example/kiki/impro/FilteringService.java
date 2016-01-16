@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
@@ -32,11 +33,12 @@ public class FilteringService extends IntentService {
     @Override
     protected void onHandleIntent(Intent workIntent) {
         Log.e(TAG,"Start filtering service");
+
         // Start filtering from original bitmap
 //        filteredBitmap = CommonResources.bitmap;
-        filteredBitmap = CommonResources.filteredBitmap;
+        //filteredBitmap = CommonResources.filteredBitmap;
         applyFilter();
-        CommonResources.filteredBitmap = filteredBitmap;
+        //CommonResources.filteredBitmap = filteredBitmap;
         Log.e(TAG,"Finish applying filter");
         int status = 0; // status to broadcast - 0 is no error
 
@@ -62,7 +64,7 @@ public class FilteringService extends IntentService {
         Mat colorMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
         //Utils.bitmapToMat(filteredBitmap, mMat);
         //TEST:
-        Utils.bitmapToMat(CommonResources.bitmap,mOrigMat);
+        Utils.bitmapToMat(CommonResources.reducedBitmap,mOrigMat);
         mOrigMat.copyTo(mMat);
 
         byte[] pixelvector = new byte[0];
@@ -134,7 +136,7 @@ public class FilteringService extends IntentService {
         }
 
 
-        Utils.matToBitmap(mMat, filteredBitmap);
+        Utils.matToBitmap(mMat, CommonResources.filteredBitmap);
     }
 
 

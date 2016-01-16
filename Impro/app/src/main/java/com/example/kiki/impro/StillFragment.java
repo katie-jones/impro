@@ -50,6 +50,7 @@ public class StillFragment extends Fragment {
     private View mView; // View corresponding to fragment -- inflated xml file
     private Bitmap mBitmap; // original, unmodified image
     private Bitmap filteredBitmap; // filtered image
+    private Bitmap reducedBitmap; // scaled image
     private ImageView mImageView;
     private final static String TAG = "StillFragment";
 
@@ -81,13 +82,19 @@ public class StillFragment extends Fragment {
         // Apply filter only if a new image has been taken
         if (savedInstanceState == null) {
             // initialize filtered image and then apply filter
-            filteredBitmap = Bitmap.createBitmap(mBitmap, 0,0, mBitmap.getWidth(), mBitmap.getHeight(), new Matrix(), true);
+            SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            int mQuality = mPrefs.getInt("p_key_quality", CommonResources.DEFAULT_QUALITY);
+
+            reducedBitmap = Bitmap.createScaledBitmap(mBitmap, (mQuality * mBitmap.getWidth()) / 100, (mQuality * mBitmap.getHeight()) / 100, true);
+            filteredBitmap = Bitmap.createBitmap(reducedBitmap, 0, 0, reducedBitmap.getWidth(), reducedBitmap.getHeight(), new Matrix(), true);
+            CommonResources.reducedBitmap = reducedBitmap;
             CommonResources.filteredBitmap = filteredBitmap;
 
             // Create new intent to filter image
+            CommonResources.filtering_toast = Toast.makeText(getActivity(), "filtering...", Toast.LENGTH_LONG);
+            CommonResources.filtering_toast.show();
             Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
             getActivity().startService(mServiceIntent);
-
         }
 
 
@@ -135,6 +142,7 @@ public class StillFragment extends Fragment {
             Log.e(TAG,"Broadcast receiver called");
             // Update filtered bitmap and set as content of image view
             filteredBitmap = CommonResources.filteredBitmap;
+            CommonResources.filtering_toast.cancel();
             mImageView.setImageBitmap(filteredBitmap);
 
 
@@ -151,7 +159,7 @@ public class StillFragment extends Fragment {
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight); // view rectangle
         RectF bufferRect; // image rectangle
 
-        bufferRect = new RectF(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+        bufferRect = new RectF(0, 0, filteredBitmap.getWidth(), filteredBitmap.getHeight());
 
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();

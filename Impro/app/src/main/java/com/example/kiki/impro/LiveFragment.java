@@ -511,21 +511,22 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                     continue;
                 }
                 // For still image captures, we use the largest available size.
-//                Size largest = Collections.max(
-//                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-//                        new CompareSizesByArea());
+                Size largest = Collections.max(
+                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+                        new CompareSizesByArea());
 
-                //
-                Size[] ourSizes = map.getOutputSizes(ImageFormat.JPEG);
-                Size imageSize = ourSizes[0];
-                int diff = mImageWidth+1;
-                for (int i=0; i<ourSizes.length; i++) {
-                    int dwidth = Math.abs(ourSizes[i].getWidth() - mImageWidth);
-                    if (dwidth < diff) {
-                        imageSize = ourSizes[i];
-                        diff = dwidth;
-                    }
-                }
+                Log.e(TAG,"New size:"+String.valueOf(largest.getWidth())+" x "+String.valueOf(largest.getHeight()));
+                Size imageSize = largest;
+//                Size[] ourSizes = map.getOutputSizes(ImageFormat.JPEG);
+//                Size imageSize = ourSizes[0];
+//                int diff = mImageWidth+1;
+//                for (int i=0; i<ourSizes.length; i++) {
+//                    int dwidth = Math.abs(ourSizes[i].getWidth() - mImageWidth);
+//                    if (dwidth < diff) {
+//                        imageSize = ourSizes[i];
+//                        diff = dwidth;
+//                    }
+//                }
 
                 mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);

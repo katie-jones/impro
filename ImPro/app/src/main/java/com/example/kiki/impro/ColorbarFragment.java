@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 import org.opencv.core.Range;
@@ -102,11 +103,15 @@ public class ColorbarFragment extends Fragment {
                 // Dynamically apply new filter to image if in Still mode.
                 StillFragment mFragment = (StillFragment)getFragmentManager().findFragmentByTag("still_fragment");
                 if (mFragment != null && mFragment.isVisible()) {
+                    CommonResources.filtering_toast = Toast.makeText(getActivity(), "filtering...", Toast.LENGTH_LONG);
+                    CommonResources.filtering_toast.show();
                     Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
                     getActivity().startService(mServiceIntent);
                 }
             }
         };
+
+
 
         mSeekBar1.setOnRangeSeekBarChangeListener(listener);
         mSeekBar2.setOnRangeSeekBarChangeListener(listener);

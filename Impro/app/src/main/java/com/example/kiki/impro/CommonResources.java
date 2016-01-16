@@ -2,6 +2,7 @@ package com.example.kiki.impro;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.widget.Toast;
 
 /**
  * Class containing resources shared across the app.
@@ -12,6 +13,9 @@ public class CommonResources {
     // original, unmodified bitmap
     public static Bitmap bitmap;
 
+    // reduced bitmap
+    public static Bitmap reducedBitmap;
+
     // filtered bitmap
     public static Bitmap filteredBitmap;
 
@@ -20,5 +24,11 @@ public class CommonResources {
 
     // key for return status of filtering service
     public static final String EXTENDED_DATA_STATUS = "com.example.kiki.impro.STATUS";
+
+    // default quality value in % for filtered image
+    public static final int DEFAULT_QUALITY = 50;
+
+    // toast showing that filtering is happening
+    public static Toast filtering_toast;
 
 }
