@@ -31,4 +31,12 @@ public class CommonResources {
     // toast showing that filtering is happening
     public static Toast filtering_toast;
 
+    // filename for filtered image
+    public static String filteredName;
+
+    // filename for original image
+    public static String bitmapName;
+
+    public static String directory = "ImPro";
+
 }

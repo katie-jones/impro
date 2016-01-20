@@ -30,7 +30,8 @@ import org.opencv.core.Mat;
 
 import java.util.prefs.PreferenceChangeListener;
 
-public class MainActivity extends Activity implements MainFragment.MainInterface, LiveFragment.LiveFragmentInterface, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends Activity implements MainFragment.MainInterface,
+        LiveFragment.LiveFragmentInterface, SharedPreferences.OnSharedPreferenceChangeListener {
     private Fragment mStillFragment;
     private Fragment mLiveFragment;
     private ColorbarFragment mColorbarFragment;
@@ -132,8 +133,6 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             stillActive=false;
             transaction.commit();
         }
-
-
     }
 
     // interface method from live fragment: initializes both fragments

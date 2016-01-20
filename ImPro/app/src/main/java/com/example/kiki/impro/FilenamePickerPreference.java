@@ -1,5 +1,6 @@
 package com.example.kiki.impro;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -189,7 +190,7 @@ public class FilenamePickerPreference extends DialogPreference {
 
                 Log.e(TAG, "Image saved! filename:" + file.getAbsolutePath());
             } catch (Exception e) {
-                Log.e("saveToExternalStorage()", e.getMessage());
+                Log.e(TAG, e.getMessage());
             }
         }
     }

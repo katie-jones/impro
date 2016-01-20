@@ -1,7 +1,6 @@
 package com.example.kiki.impro;
 
-import android.app.Activity;
-import android.app.Application;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
@@ -12,12 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.graphics.drawable.LayerDrawable;
-import android.media.Image;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -26,22 +20,11 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by kiki on 10.11.15.
@@ -52,6 +35,9 @@ public class StillFragment extends Fragment {
     private Bitmap filteredBitmap; // filtered image
     private Bitmap reducedBitmap; // scaled image
     private ImageView mImageView;
+    private Button mButtonFilt;
+    private Button mButtonOrig;
+
     private final static String TAG = "StillFragment";
 
     @Override
@@ -61,6 +47,25 @@ public class StillFragment extends Fragment {
         mView = inflater.inflate(R.layout.stillfragment, container, false);
         mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
         mBitmap = CommonResources.bitmap;
+
+        // Set up button actions for saving images
+        mButtonFilt = (Button) mView.findViewById(R.id.button_savefilt);
+        mButtonFilt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e(TAG,"saving filtered");
+                save_image("filtered");
+            }
+        });
+        mButtonOrig = (Button) mView.findViewById(R.id.button_saveorig);
+        mButtonOrig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e(TAG,"saving original");
+                save_image("original");
+            }
+        });
+
 
         // use global layout listener to find when view sizes have been assigned so we can
         // determine size of image view and apply appropriate transformation
@@ -120,13 +125,28 @@ public class StillFragment extends Fragment {
 //        mStatusIntentFilter.addDataScheme("http");
 
 
+
+
         // Registers the FilteringBroadcastReceiver and its intent filters
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mReceiver,
                 mStatusIntentFilter);
-
-
     }
+
+    public void save_image(String type) {
+        Log.e(TAG, "save_image:" + type);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("FilenameFragment");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        DialogFragment newFragment = FilenamePickerFragment.newInstance(type);
+        newFragment.show(ft, "FilenameFragment");
+    }
+
 
 
     @Override

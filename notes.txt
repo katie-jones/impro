@@ -1,3 +1,11 @@
-Preferences 
+Bugs
 
-int loweri, upperi 
+- CMYK filtered when all filters set to 0!
+- Camera closed when not actually open -> illegalstate exception
+
+TODOs 
+
+- Don't filter when all filters set to 0!
+
+
+

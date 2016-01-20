@@ -19,7 +19,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     private final static String TAG = "MainFrag";
 
     private View mView; // View corresponding to fragment -- inflated xml file
-//    private Button mButton;
 
     private MainInterface mMainInterface;
 
@@ -34,8 +33,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.mainfragment, container, false);
 
-//        mButton.setOnClickListener(this);
-//        mButton = (Button) mView.findViewById(R.id.button);
         return mView;
     }
 

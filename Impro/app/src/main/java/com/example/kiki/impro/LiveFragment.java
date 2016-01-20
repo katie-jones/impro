@@ -865,14 +865,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
         }
     }
 
-
-
-
-
-
-
-
-
     private class BitmapMaker implements Runnable {
 
         /**
