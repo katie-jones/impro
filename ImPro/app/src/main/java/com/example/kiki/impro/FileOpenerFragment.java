@@ -3,6 +3,7 @@ package com.example.kiki.impro;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,7 +13,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +37,10 @@ import xdroid.toaster.Toaster;
 public class FileOpenerFragment extends DialogFragment {
     Button mButton_Ok;
     Button mButton_Cancel;
+    View mView;
     static private String TAG="FileOpenerFragment";
+    private static final String TAG_FILE_FRAGMENT="FileFragment";
+
     public interface LiveFragmentInterface {
         public void toStillFragment();
     }
@@ -68,10 +74,18 @@ public class FileOpenerFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.filenameopener_dialog, null);
+        mView = inflater.inflate(R.layout.filenameopener_dialog, null);
 
-        mButton_Ok = (Button) v.findViewById(R.id.button_ok);
-        mButton_Cancel = (Button) v.findViewById(R.id.button_cancel);
+        FileOpenerList fragment = new FileOpenerList();
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.replace(R.id.fileopenerlist, fragment, TAG_FILE_FRAGMENT);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        //ft.addToBackStack(null);
+        ft.commit();
+
+
+        mButton_Ok = (Button) mView.findViewById(R.id.button_ok);
+        mButton_Cancel = (Button) mView.findViewById(R.id.button_cancel);
 
         mButton_Ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +114,6 @@ public class FileOpenerFragment extends DialogFragment {
             }
         });
 
-        return v;
+        return mView;
     }
 }

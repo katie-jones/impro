@@ -287,7 +287,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     private HandlerThread mBackgroundThread;
 
     /**
-     * A {@link Handler} for running tasks in the background.
+     * A {@link Handler} for running tasks in the list_selector.
      */
     private Handler mBackgroundHandler;
 
@@ -650,7 +650,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     }
 
     /**
-     * Starts a background thread and its {@link Handler}.
+     * Starts a list_selector thread and its {@link Handler}.
      */
     private void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("CameraBackground");
@@ -659,7 +659,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     }
 
     /**
-     * Stops the background thread and its {@link Handler}.
+     * Stops the list_selector thread and its {@link Handler}.
      */
     private void stopBackgroundThread() {
         mBackgroundThread.quitSafely();

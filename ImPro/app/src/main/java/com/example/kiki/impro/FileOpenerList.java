@@ -1,10 +1,6 @@
 package com.example.kiki.impro;
 
-import android.app.DialogFragment;
-import android.app.FragmentTransaction;
 import android.app.ListFragment;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -31,6 +27,8 @@ public class FileOpenerList extends ListFragment {
     static private FileArrayAdapter adapter;
     private View mView;
     private ListView mListView;
+    private ListView itemView;
+    private int currentPosition = 0;
     private static final String TAG_STILL_FRAGMENT="StillFragment";
 
     @Override
@@ -39,7 +37,7 @@ public class FileOpenerList extends ListFragment {
 
         Log.e(TAG,"onCreateView");
 
-        mView = inflater.inflate(R.layout.fileopenerlist, container, false);
+        mView = inflater.inflate(R.layout.filenameopener_list, container, false);
         String fullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()+"/"+CommonResources.directory;
         currentDir = new File(fullPath+"/");
         fill(currentDir);
@@ -50,9 +48,9 @@ public class FileOpenerList extends ListFragment {
     /** Called when the fragment is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.e(TAG,"onCreate");
+        Log.e(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        //setRetainInstance(true);
 
     }
 
@@ -67,27 +65,10 @@ public class FileOpenerList extends ListFragment {
         }
         else
         {
-            onFileClick(o);
+            Toast.makeText(this.getActivity(), "File Clicked: "+o.getPath(), Toast.LENGTH_SHORT).show();
+            // TODO: show that file has been clicked
+            CommonResources.file_to_be_opened = o.getPath();
         }
-    }
-
-    private void onFileClick(Option o)
-    {
-
-        Toast.makeText(this.getActivity(), "File Clicked: "+o.getPath(), Toast.LENGTH_SHORT).show();
-        // TODO: show that file has been clicked
-        CommonResources.file_to_be_opened = o.getPath();
-
-        // Load bitmap
-
-
-        // Show picture in Stillfragment.
-//        StillFragment mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
-//        if (mStillFragment==null)
-//            mStillFragment = new StillFragment();
-//        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//        transaction.replace(this.getId(), mStillFragment, TAG_STILL_FRAGMENT);
-//        transaction.commit();
     }
 
     private void fill(File f)
@@ -117,7 +98,7 @@ public class FileOpenerList extends ListFragment {
         if(!f.getName().equalsIgnoreCase(CommonResources.directory))
             dir.add(0,new Option("..", "Parent Directory",f.getParent()));
 
-        adapter = new FileArrayAdapter(FileOpenerList.this.getActivity(),R.layout.fileopenerlist,dir);
+        adapter = new FileArrayAdapter(FileOpenerList.this.getActivity(),R.layout.filenameopener_list,dir);
         Log.e(TAG, "adapter created");
         this.setListAdapter(adapter);
         Log.e(TAG, "adapter set");

@@ -32,9 +32,9 @@ public class FileArrayAdapter extends ArrayAdapter<Option> {
         items = objects;
     }
 
-    public Option getItem(int i)
+    public Option getItem(int i_new)
     {
-        return items.get(i);
+        return items.get(i_new);
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -45,11 +45,16 @@ public class FileArrayAdapter extends ArrayAdapter<Option> {
         }
         final Option o = items.get(position);
         if (o != null) {
+
             TextView t1 = (TextView) v.findViewById(R.id.TextView01);
             TextView t2 = (TextView) v.findViewById(R.id.TextView02);
 
+
+                //t1.setBackgroundColor(0xA0FF8000);
+                //t2.setBackgroundColor(0xA0FF8000);
             if(t1!=null)
                 t1.setText(o.getName());
+
             if(t2!=null)
                 t2.setText(o.getData());
 

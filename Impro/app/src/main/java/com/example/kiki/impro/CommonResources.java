@@ -39,6 +39,6 @@ public class CommonResources {
 
     public static String directory = "ImPro";
 
-    public static String file_to_be_opened;
+    public static String file_to_be_opened = "file";
 
 }
