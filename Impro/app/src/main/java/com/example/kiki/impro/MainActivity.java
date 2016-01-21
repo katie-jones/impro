@@ -6,39 +6,27 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Mat;
-
-import java.util.prefs.PreferenceChangeListener;
 
 public class MainActivity extends Activity implements MainFragment.MainInterface,
         LiveFragment.LiveFragmentInterface, SharedPreferences.OnSharedPreferenceChangeListener {
-    private Fragment mStillFragment;
-    private Fragment mLiveFragment;
+    private StillFragment mStillFragment;
+    private LiveFragment mLiveFragment;
     private ColorbarFragment mColorbarFragment;
     static private String TAG = "MainActivity";
-    private static final String TAG_LIVE_FRAGMENT = "live_fragment";
-    private static final String TAG_STILL_FRAGMENT = "still_fragment";
-    private static final String TAG_COLORBAR_FRAGMENT = "colorbar_fragment";
+    private static final String TAG_LIVE_FRAGMENT = "LiveFragment";
+    private static final String TAG_STILL_FRAGMENT = "StillFragment";
+    private static final String TAG_COLORBAR_FRAGMENT = "ColorbarFragment";
+    private static final String TAG_FILE_OPENER = "FileOpener";
     private static boolean stillActive;
 
 
@@ -112,6 +100,9 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
         mColorbarFragment = (ColorbarFragment) getFragmentManager().findFragmentById(R.id.colorbarfragment);
 
+        // TESTING
+        mLiveFragment = new LiveFragment();
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
@@ -122,24 +113,36 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         Log.e(TAG, "button clicked");
         // Exchange current fragment with the other one.
         if (mLiveFragment.isVisible()){
-            LiveFragment frag = (LiveFragment) mLiveFragment;
+            Log.e(TAG,"live visible");
+            LiveFragment frag = (LiveFragment) getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
+            frag.takePicture();
+            stillActive=false;
+            //LiveFragment frag = (LiveFragment) mLiveFragment;
             // take picture in live fragment, when its done, the fragment will change to
             // still fragment via Callback.
-            frag.takePicture();
+            //frag.takePicture();
         }
-        else {
+        else if (mStillFragment.isVisible()) {
+            Log.e(TAG,"still visible");
+            mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.replace(mStillFragment.getId(), mLiveFragment, TAG_LIVE_FRAGMENT);
             stillActive=false;
             transaction.commit();
+        }
+        else if (getFragmentManager().findFragmentByTag(TAG_FILE_OPENER).isVisible()){
+            Log.e(TAG,"file opener visible");
+        }
+        else {
+            Log.e(TAG,"neither visible ");
         }
     }
 
     // interface method from live fragment: initializes both fragments
     public void onFragmentCreated(Bundle savedInstanceState) {
         Log.e(TAG,"fragment created");
-        mLiveFragment = getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
-        mStillFragment = getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
+        mLiveFragment = (LiveFragment) getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
+        mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
         if (mLiveFragment==null)
             mLiveFragment = new LiveFragment();
         if (mStillFragment==null)

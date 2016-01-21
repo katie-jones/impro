@@ -37,7 +37,9 @@
     <string name="saveImageSummary">Save filtered image to internal storage</string>
     <string name="button_saveorig">Save original image</string>
     <string name="button_savefilt">Save filtered image</string>
-    <string name="button_back">Back</string>
+    <string name="button_open">Load image from folder</string>
     <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>
+
+    <string name="fileopen_title">Choose file to be loaded</string>
 </resources>

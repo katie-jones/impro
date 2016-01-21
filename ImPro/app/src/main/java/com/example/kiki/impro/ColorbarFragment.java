@@ -24,6 +24,8 @@ import org.opencv.core.Scalar;
 
 import java.util.Set;
 
+import xdroid.toaster.Toaster;
+
 
 /**
  * Created by kiki on 10.11.15.
@@ -107,7 +109,7 @@ public class ColorbarFragment extends Fragment {
 
 
                 // Dynamically apply new filter to image if in Still mode if any type is set.;
-                StillFragment mFragment = (StillFragment)getFragmentManager().findFragmentByTag("still_fragment");
+                StillFragment mFragment = (StillFragment)getFragmentManager().findFragmentByTag("StillFragment");
                 if (mFragment != null && mFragment.isVisible() && !filter_inactive(type)) {
                     CommonResources.filtering_toast = Toast.makeText(getActivity(), "filtering...", Toast.LENGTH_LONG);
                     CommonResources.filtering_toast.show();
@@ -133,8 +135,11 @@ public class ColorbarFragment extends Fragment {
 
     public void filter_reset() {
         // TODO: filter reset
-        //ImageView mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
-        //mImageView.setImageBitmap(CommonResources.bitmap);
+        Toaster.toast("Resetting image...");
+        Toaster.toast(String.valueOf(mView.getAlpha()));
+        ImageView mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
+        Toaster.toast(CommonResources.reducedBitmap.getByteCount());
+        mImageView.setImageBitmap(CommonResources.reducedBitmap);
     }
     public boolean filter_inactive(int type){
         boolean inactive = false;

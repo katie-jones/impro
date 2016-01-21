@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -43,6 +44,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 
@@ -64,7 +66,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
     private View mView; // View corresponding to fragment -- inflated xml file
+    private Button mButton;
     private final static String TAG = "livefragment";
+    static private String TAG_LIVE_FRAGMENT="LiveFragment";
+    static private String TAG_FILE_OPENER="FileOpener";
+
     private final int mImageWidth = 600;
 
     private LiveFragmentInterface mInterface;
@@ -88,11 +94,28 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     }
 
 
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         myOnAttach(activity);
 
+    }
+
+    public void load_image() {
+        Log.e(TAG, "opening");
+//        FragmentTransaction ft = getFragmentManager().beginTransaction();
+//        Fragment prev = getFragmentManager().findFragmentByTag("FilenameFragment");
+//        if (prev != null) {
+//            ft.remove(prev);
+//        }
+//        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        FileOpenerFragment mFileOpener = new FileOpenerFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(this.getId(), mFileOpener, TAG_FILE_OPENER);
+        transaction.commit();
     }
 
 
@@ -113,10 +136,16 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.livefragment, container, false);
-//        Log.e(TAG,"on create view");
+
+        mButton = (Button) mView.findViewById(R.id.button_open);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                load_image();
+            }
+        });
         return mView;
     }
-
 
     /**
      * Conversion from screen rotation to JPEG orientation.
