@@ -2,9 +2,6 @@ package com.example.kiki.impro;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.FragmentTransaction;
-import android.app.ListActivity;
-import android.app.ListFragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,116 +24,70 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import xdroid.toaster.Toaster;
 
 /**
  * Created by kiki on 2016-01-15.
- *
- * from
- * http://www.dreamincode.net/forums/topic/190013-creating-simple-file-chooser/
  */
-public class FileOpenerFragment extends ListFragment {
-    static private String TAG="FileOpener";
-    private File currentDir;
-    static private FileArrayAdapter adapter;
-    private View mView;
-    private static final String TAG_STILL_FRAGMENT="StillFragment";
+public class FileOpenerFragment extends DialogFragment {
+    Button mButton_Ok;
+    Button mButton_Cancel;
+    static private String TAG="FileOpenerFragment";
+    public interface LiveFragmentInterface {
+        public void toStillFragment();
+    }
+    LiveFragmentInterface mInterface;
 
+    static FileOpenerFragment newInstance() {
+        return new FileOpenerFragment();
+    }
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
-        Log.e(TAG,"onCreateView");
-
-        mView = inflater.inflate(R.layout.fileopenerfragment, container, false);
-
-        String fullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()+"/"+CommonResources.directory;
-        currentDir = new File(fullPath+"/");
-        fill(currentDir);
-
-        return mView;
     }
 
-    /** Called when the fragment is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.e(TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        // TODO Auto-generated method stub
-        super.onListItemClick(l, v, position, id);
-        Option o = adapter.getItem(position);
-        if(o.getData().equalsIgnoreCase("folder")||o.getData().equalsIgnoreCase("parent directory")){
-            currentDir = new File(o.getPath());
-            fill(currentDir);
-        }
-        else
-        {
-            onFileClick(o);
-        }
-    }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.filenameopener_dialog, null);
 
-    private void onFileClick(Option o)
-    {
+        mButton_Ok = (Button) v.findViewById(R.id.button_ok);
+        mButton_Cancel = (Button) v.findViewById(R.id.button_cancel);
 
-        Toast.makeText(this.getActivity(), "File Clicked: "+o.getPath(), Toast.LENGTH_SHORT).show();
+        mButton_Ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // return the chosen filename
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                Bitmap bitmap = BitmapFactory.decodeFile(CommonResources.file_to_be_opened, options);
 
-        // Load bitmap
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(o.getPath(), options);
+                // Save in common resources
+                CommonResources.bitmap = bitmap;
 
-        // Save in common resources
-        CommonResources.bitmap = bitmap;
+                //TODO: change to still fragment
+                mInterface.toStillFragment();
 
-        // Show picture in Stillfragment.
-        StillFragment mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
-        if (mStillFragment==null)
-            mStillFragment = new StillFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(this.getId(), mStillFragment, TAG_STILL_FRAGMENT);
-        transaction.commit();
-    }
-
-    private void fill(File f)
-    {
-        Log.e(TAG,"fill");
-        File[]dirs = f.listFiles();
-        List<Option> dir = new ArrayList<Option>();
-        List<Option>fls = new ArrayList<Option>();
-        try{
-            for(File ff: dirs)
-            {
-                if(ff.isDirectory())
-                    dir.add(new Option(ff.getName(),"Folder",ff.getAbsolutePath()));
-                else
-                {
-                    fls.add(new Option(ff.getName(),"File Size: "+ff.length(),ff.getAbsolutePath()));
-                }
+                getDialog().dismiss();
             }
-        }catch(Exception e)
-        {
-            Log.e(TAG, e.getMessage());
-        }
-        Log.e(TAG, "sort and show");
-        Collections.sort(dir);
-        Collections.sort(fls);
-        dir.addAll(fls);
-        if(!f.getName().equalsIgnoreCase(CommonResources.directory))
-            dir.add(0,new Option("..", "Parent Directory",f.getParent()));
+        });
 
-        adapter = new FileArrayAdapter(FileOpenerFragment.this.getActivity(),R.layout.fileopenerfragment,dir);
-        Log.e(TAG, "adapter created");
-        this.setListAdapter(adapter);
-        Log.e(TAG, "adapter set");
+        mButton_Cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // TODO: change to still fragment
+                getDialog().dismiss();
+            }
+        });
+
+        return v;
     }
 }

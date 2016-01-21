@@ -132,49 +132,6 @@ public class FilenamePickerFragment extends DialogFragment {
         }
     }
 
-
-
-    /**
-     * Saves a JPEG {@link Image} into the specified {@link File}.
-     */
-
-    private static class ImageSaverInternal implements Runnable {
-        private final Bitmap mImage;
-        private final File mFile;
-
-        public ImageSaverInternal(Bitmap image, File file) {
-            mImage = image;
-            mFile = file;
-            //mContext = context;
-        }
-
-        @Override
-        public void run() {
-
-            FileOutputStream output = null;
-            try {
-                if (mFile.exists()) mFile.delete();
-                //mFile.createNewFile();
-                Log.e(TAG, "Make file output stream");
-                output = new FileOutputStream(mFile);
-                Log.e(TAG, "Start saving file");
-                mImage.compress(Bitmap.CompressFormat.PNG, 100, output);
-                output.flush(); // makes sure all data in buffer is written
-                Log.e(TAG, "Image saved! filename:" + mFile.getName());
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (null != output) {
-                    try {
-                        output.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
     private static class ImageSaverExternal implements Runnable {
         //The JPEG image
         private final Bitmap mImage;

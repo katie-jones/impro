@@ -30,7 +30,6 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -50,8 +49,6 @@ import android.widget.Toast;
 
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,10 +109,16 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 //        ft.addToBackStack(null);
 
         // Create and show the dialog.
-        FileOpenerFragment mFileOpener = new FileOpenerFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(this.getId(), mFileOpener, TAG_FILE_OPENER);
-        transaction.commit();
+        // TODO: Do this via interface?
+        FileOpenerFragment dialogFragment = FileOpenerFragment.newInstance();
+        dialogFragment.setRetainInstance(true);
+        dialogFragment.show(getFragmentManager(), TAG_FILE_OPENER);
+
+
+//        FileOpenerList mFileOpener = new FileOpenerList();
+//        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//        transaction.replace(this.getId(), mFileOpener, TAG_FILE_OPENER);
+//        transaction.commit();
     }
 
 

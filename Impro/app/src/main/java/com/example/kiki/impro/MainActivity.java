@@ -18,7 +18,8 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 public class MainActivity extends Activity implements MainFragment.MainInterface,
-        LiveFragment.LiveFragmentInterface, SharedPreferences.OnSharedPreferenceChangeListener {
+        LiveFragment.LiveFragmentInterface,FileOpenerFragment.LiveFragmentInterface,
+        SharedPreferences.OnSharedPreferenceChangeListener {
     private StillFragment mStillFragment;
     private LiveFragment mLiveFragment;
     private ColorbarFragment mColorbarFragment;
