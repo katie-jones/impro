@@ -136,7 +136,7 @@ public class StillFragment extends Fragment {
     public void save_image(String type) {
         Log.e(TAG, "save_image:" + type);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("FilenameFragment");
+        FilenamePickerFragment prev = (FilenamePickerFragment) getFragmentManager().findFragmentByTag("FilenameFragment");
         if (prev != null) {
             ft.remove(prev);
         }
@@ -239,47 +239,4 @@ public class StillFragment extends Fragment {
             }
         }
     }
-
-
-
-//
-//        // Checks if external storage is available for read and write
-//        public boolean isExternalStorageWritable() {
-//            String state = Environment.getExternalStorageState();
-//            if (Environment.MEDIA_MOUNTED.equals(state)) {
-//                return true;
-//            }
-//            return false;
-//        }
-//
-//        // Checks if external storage is available to at least read
-//        public boolean isExternalStorageReadable() {
-//            String state = Environment.getExternalStorageState();
-//            if (Environment.MEDIA_MOUNTED.equals(state) ||
-//                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-//                return true;
-//            }
-//            return false;
-//        }
-//
-//        // Get file where picture can be stored
-//        public File getAlbumStorageDir(String pictureName) {
-//            // Get the directory for the user's public pictures directory.
-//            File file = new File(Environment.DIRECTORY_PICTURES,pictureName);
-////                    Environment.getExternalStorageDirectory()+"/myfolder",pictureName);
-////                    Environment.getExternalStoragePublicDirectory(
-////                    Environment.DIRECTORY_PICTURES), pictureName);
-//
-//            if (!file.mkdirs()) {
-//                Log.e(TAG, "Directory not created");
-//            }
-//            return file;
-//        }
-//
-//
-//    }
-
-
-
-
 }

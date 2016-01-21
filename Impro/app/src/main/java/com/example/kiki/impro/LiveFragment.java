@@ -785,9 +785,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     public void takePicture() {
         lockFocus();
     }
-    public void takePicturetwo(View v) {
-        lockFocus();
-    }
 
     /**
      * Lock the focus as the first step for a still image capture.

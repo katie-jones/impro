@@ -27,18 +27,6 @@
         android:negativeButtonText="@android:string/cancel"
         android:defaultValue="50"
         />
-
-    <com.example.kiki.impro.FilenamePickerPreference
-        android:id="@+id/filenamePickerPref"
-        android:key="p_filename_key"
-        android:title="@string/saveImage"
-        android:summary="@string/saveImageSummary"
-        android:positiveButtonText="@android:string/ok"
-        android:negativeButtonText="@android:string/cancel"
-        android:defaultValue="filename"
-        />
-
-
 </PreferenceScreen>
 
 

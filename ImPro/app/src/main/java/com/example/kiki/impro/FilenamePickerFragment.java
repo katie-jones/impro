@@ -1,22 +1,15 @@
 package com.example.kiki.impro;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
-import android.preference.DialogPreference;
 import android.provider.MediaStore;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -136,8 +129,6 @@ public class FilenamePickerFragment extends DialogFragment {
                     Log.i(TAG, "uri=" + uri);
                 }
             });
-
-
         }
     }
 
