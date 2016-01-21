@@ -1,5 +1,6 @@
 package com.example.kiki.impro;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -43,9 +44,20 @@ public class FileOpenerFragment extends DialogFragment {
         return new FileOpenerFragment();
     }
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        myOnAttach(activity);
 
+    }
+    public void myOnAttach(Activity activity) {
+        // Make sure the interface ClickCallback is defined in MainActivity
+        try {
+            mInterface = (LiveFragmentInterface) activity;
+        }
+        catch (Exception e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement LiveFragmentInterface");
+        }
     }
 
     @Override

@@ -101,9 +101,6 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
         mColorbarFragment = (ColorbarFragment) getFragmentManager().findFragmentById(R.id.colorbarfragment);
 
-        // TESTING
-        mLiveFragment = new LiveFragment();
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
@@ -115,27 +112,21 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         // Exchange current fragment with the other one.
         if (mLiveFragment.isVisible()){
             Log.e(TAG,"live visible");
-            LiveFragment frag = (LiveFragment) getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
-            frag.takePicture();
+//            LiveFragment frag = (LiveFragment) getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
+//            frag.takePicture();
             stillActive=false;
-            //LiveFragment frag = (LiveFragment) mLiveFragment;
+            LiveFragment frag = (LiveFragment) mLiveFragment;
             // take picture in live fragment, when its done, the fragment will change to
             // still fragment via Callback.
-            //frag.takePicture();
+            frag.takePicture();
         }
-        else if (mStillFragment.isVisible()) {
+        else  {
             Log.e(TAG,"still visible");
             mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.replace(mStillFragment.getId(), mLiveFragment, TAG_LIVE_FRAGMENT);
             stillActive=false;
             transaction.commit();
-        }
-        else if (getFragmentManager().findFragmentByTag(TAG_FILE_OPENER).isVisible()){
-            Log.e(TAG,"file opener visible");
-        }
-        else {
-            Log.e(TAG,"neither visible ");
         }
     }
 

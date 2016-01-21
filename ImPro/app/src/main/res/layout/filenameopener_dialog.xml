@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
     <fragment
-        android:id="@+id/flContent"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/fileopenerlist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:padding = "10dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         class="com.example.kiki.impro.FileOpenerList" />
 
-    <!--<Button-->
-        <!--android:id="@+id/button_cancel"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@id/texts"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:text="@string/button_cancel" />-->
-    <!--<Button-->
-        <!--android:id="@+id/button_ok"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_toStartOf="@id/button_cancel"-->
-        <!--android:layout_below="@id/texts"-->
-        <!--android:text="@string/button_ok" />-->
-</LinearLayout>
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fileopenerlist"
+        android:layout_alignParentEnd="true"
+        android:text="@string/button_cancel" />
+    <Button
+        android:id="@+id/button_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/button_cancel"
+        android:layout_below="@id/fileopenerlist"
+        android:text="@string/button_ok" />
+</RelativeLayout>
