@@ -3,6 +3,7 @@ package com.example.kiki.impro;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
@@ -12,6 +13,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.preference.DialogPreference;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
@@ -28,6 +30,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import xdroid.toaster.Toaster;
 
 /**
  * Created by kiki on 2015-12-07.
@@ -126,14 +130,14 @@ public class FilenamePickerFragment extends DialogFragment {
             mThread.start();
 
             // alert media scanner of new image file
-            MediaScannerConnection.scanFile(getActivity(), new String[]{mFilename+".png"}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            MediaScannerConnection.scanFile(getActivity(), new String[]{mFilename + ".png"}, null, new MediaScannerConnection.OnScanCompletedListener() {
                 public void onScanCompleted(String path, Uri uri) {
                     Log.i(TAG, "Scanned " + path + ":");
                     Log.i(TAG, "uri=" + uri);
                 }
             });
 
-            Toast.makeText(getActivity(),"Saved picture under "+CommonResources.directory+"/"+mFilename,Toast.LENGTH_SHORT).show();
+
         }
     }
 
@@ -180,11 +184,6 @@ public class FilenamePickerFragment extends DialogFragment {
         }
     }
 
-    public final static String APP_PATH_SD_CARD = "/DesiredSubfolderName/";
-    public final static String APP_THUMBNAIL_PATH_SD_CARD = "thumbnails";
-
-
-
     private static class ImageSaverExternal implements Runnable {
         //The JPEG image
         private final Bitmap mImage;
@@ -201,23 +200,32 @@ public class FilenamePickerFragment extends DialogFragment {
         public void run() {
             String fullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()+"/"+CommonResources.directory;
             try {
+                boolean result = true;
                 File dir = new File(fullPath);
                 if (!dir.exists()) {
-                    dir.mkdirs();
+                    result = dir.mkdirs();
                 }
+                if (result) {
 
-                OutputStream fOut = null;
-                File file = new File(fullPath,mFilename);
-                file.createNewFile();
-                fOut = new FileOutputStream(file);
+                    OutputStream fOut = null;
+                    File file = new File(fullPath, mFilename);
+                    boolean existant = file.createNewFile();
 
-                mImage.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                fOut.flush();
-                fOut.close();
+                    fOut = new FileOutputStream(file);
 
-                MediaStore.Images.Media.insertImage(mContext.getContentResolver(), file.getAbsolutePath(), file.getName(), file.getName());
+                    mImage.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                    fOut.flush();
+                    fOut.close();
 
-                Log.e(TAG, "Image saved! filename:" + file.getAbsolutePath());
+                    MediaStore.Images.Media.insertImage(mContext.getContentResolver(), file.getAbsolutePath(), file.getName(), file.getName());
+
+                    if (!existant) Toaster.toast("Overwritten: "+file.getAbsolutePath());
+                    else Toaster.toast("Image saved under " + file.getAbsolutePath());
+                    Log.e(TAG, "Image saved under " + file.getAbsolutePath());
+
+                } else {
+                    Toaster.toast("Could not create directory at " + fullPath);
+                }
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
