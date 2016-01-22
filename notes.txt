@@ -1,15 +1,15 @@
 Bugs
 
-- CMYK filtered when all filters set to 0!
 - Camera closed when not actually open -> illegalstate exception
 errors...
  Unable to resume activity {com.example.kiki.impro/com.example.kiki.impro.MainActivity}: java.lang.RuntimeException: Time out waiting to lock camera opening
 'void android.hardware.camera2.CaptureRequest$Builder.set(android.hardware.camera2.CaptureRequest$Key, java.lang.Object)' on a null object reference
 
-
 TODOs 
 
-- Don't filter when all filters set to 0!
-
-
+- add jpg / png option
+- add listener to quality preference so that we can change it while picture has been taken
+- add interface to fileopenerlist / dialog for choosing file on click.
+- don't make filtering happen all the time.
+ 
 

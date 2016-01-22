@@ -21,7 +21,8 @@ import org.opencv.imgproc.Imgproc;
  */
 
 public class FilteringService extends IntentService {
-
+    private final int HMaxValue = 180;
+    private final int RGBMaxValue = 255;
     private Bitmap filteredBitmap;
     private final String TAG = "filtering_service";
 
@@ -52,8 +53,8 @@ public class FilteringService extends IntentService {
     }
 
     private void applyFilter() {
-        int width = CommonResources.bitmap.getWidth();
-        int height = CommonResources.bitmap.getHeight();
+        int width = CommonResources.reducedBitmap.getWidth();
+        int height = CommonResources.reducedBitmap.getHeight();
         int depth = 3;
 
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -79,7 +80,7 @@ public class FilteringService extends IntentService {
                 colorMat = mMat;
                 break;
             case 1: // HSV
-                Log.e(TAG,"HSV");
+                Log.e(TAG, "HSV");
                 Imgproc.cvtColor(mMat, colorMat, Imgproc.COLOR_RGB2HSV);
                 depth = 3;
                 pixelvector = new byte[depth];
@@ -93,48 +94,60 @@ public class FilteringService extends IntentService {
                 zeros = new byte[depth];
         }
 
+        // Read min and max filter values and check if filter has to be applied.
         int[] lower_array = new int[depth];
         int[] upper_array = new int[depth];
+        boolean do_filtering = false;
         for (int k=0; k<depth;k++) {
             lower_array[k] = mPrefs.getInt("lower"+String.valueOf(k+1), 0);
+            if (type == 1 && k==0) {
+                upper_array[k] = mPrefs.getInt("upper"+String.valueOf(k+1), HMaxValue);
+                if (lower_array[k]>0 || upper_array[k]<HMaxValue) {
+                    do_filtering = true;
+                }
+            }
+            else {
+                upper_array[k] = mPrefs.getInt("upper"+String.valueOf(k+1), RGBMaxValue);
+                if (lower_array[k]>0 || upper_array[k]<RGBMaxValue) {
+                    do_filtering = true;
+                }
+            }
 //            Log.e(TAG,"lower"+String.valueOf(lower_array[k]));
-            upper_array[k] = mPrefs.getInt("upper"+String.valueOf(k+1), 255);
 //            Log.e(TAG,"upper"+String.valueOf(upper_array[k]));
+
+
         }
 
-        boolean inrange;
-        int this_pix;
+        // Filter out colors of interest
+        if (do_filtering) {
+            Log.e(TAG,"filtering");
 
-        //Utils.bitmapToMat(filteredBitmap, mMat);
-        //TEST:
+            boolean inrange;
+            int this_pix;
 
-        //List<Mat> planes = new ArrayList<Mat>();
-        //Core.split(mMat, planes);
-//        Log.e(TAG, "height" + String.valueOf(mMat.height()));
-        //Log.e(TAG, "pixel" + String.valueOf(mMat.get(0, 0, pixelvector)));
-//        Log.e(TAG, "depth" + String.valueOf(mMat.type()));
-        for (int i = 0; i<mMat.height(); i++) {
-            for (int j = 0; j<mMat.width(); j++) {
-                inrange=true;
-                colorMat.get(i, j, pixelvector);
-                for (int k = 0; k<depth; k++) {
-                    // convert signed byte into unsigned integer
-                    this_pix = ((int) pixelvector[k]) & 0xFF;
+
+            for (int i = 0; i<mMat.height(); i++) {
+                for (int j = 0; j<mMat.width(); j++) {
+                    inrange=true;
+                    colorMat.get(i, j, pixelvector);
+                    for (int k = 0; k<depth; k++) {
+                        // convert signed byte into unsigned integer
+                        this_pix = ((int) pixelvector[k]) & 0xFF;
 //                    if ((j==0) && (i==0)) {
 //                        Log.e(TAG, "pixel " + String.valueOf(pixelvector[k]));
 //                        Log.e(TAG, "pixel int " + String.valueOf(this_pix));
 //                    }
-                    if ((this_pix > upper_array[k]) || this_pix < lower_array[k]) {
-                        inrange=false;
-                        break;
+                        if ((this_pix > upper_array[k]) || this_pix < lower_array[k]) {
+                            inrange=false;
+                            break;
+                        }
                     }
-                }
-                if (!inrange) {
-                    mMat.put(i, j, zeros);
+                    if (!inrange) {
+                        mMat.put(i, j, zeros);
+                    }
                 }
             }
         }
-
 
         Utils.matToBitmap(mMat, CommonResources.filteredBitmap);
     }

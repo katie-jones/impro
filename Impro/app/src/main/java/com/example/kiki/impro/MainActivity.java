@@ -58,6 +58,17 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+
+        int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+
+        if (permission2 != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    1
+            );
+        }
     }
 
 

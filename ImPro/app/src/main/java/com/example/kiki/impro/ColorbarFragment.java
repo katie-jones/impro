@@ -110,15 +110,11 @@ public class ColorbarFragment extends Fragment {
 
                 // Dynamically apply new filter to image if in Still mode if any type is set.;
                 StillFragment mFragment = (StillFragment)getFragmentManager().findFragmentByTag("StillFragment");
-                if (mFragment != null && mFragment.isVisible() && !filter_inactive(type)) {
+                if (mFragment != null && mFragment.isVisible()) {
                     CommonResources.filtering_toast = Toast.makeText(getActivity(), "filtering...", Toast.LENGTH_LONG);
                     CommonResources.filtering_toast.show();
                     Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
                     getActivity().startService(mServiceIntent);
-                }
-                else if (mFragment != null && mFragment.isVisible() & filter_inactive(type)){
-                    //TODO: reset bitmap here.
-                    filter_reset();
                 }
             }
         };
@@ -131,49 +127,6 @@ public class ColorbarFragment extends Fragment {
         mSeekBar4.setOnRangeSeekBarChangeListener(listener);
 
         return mView;
-    }
-
-    public void filter_reset() {
-        // TODO: filter reset
-        Toaster.toast("Resetting image...");
-        Toaster.toast(String.valueOf(mView.getAlpha()));
-        ImageView mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
-        Toaster.toast(CommonResources.reducedBitmap.getByteCount());
-        mImageView.setImageBitmap(CommonResources.reducedBitmap);
-    }
-    public boolean filter_inactive(int type){
-        boolean inactive = false;
-        switch (type) {
-            case 0: // RGB
-                inactive = ((mSeekBar1.getSelectedMinValue()==0) &&
-                            (mSeekBar2.getSelectedMinValue()==0) &&
-                            (mSeekBar3.getSelectedMinValue()==0) &&
-                            (mSeekBar1.getSelectedMaxValue()==RGBMaxValue) &&
-                            (mSeekBar2.getSelectedMaxValue()==RGBMaxValue) &&
-                            (mSeekBar3.getSelectedMaxValue()==RGBMaxValue));
-                break;
-            case 1: // HSV
-                inactive = ((mSeekBar1.getSelectedMinValue()==0) &&
-                        (mSeekBar2.getSelectedMinValue()==0) &&
-                        (mSeekBar3.getSelectedMinValue()==0) &&
-                        (mSeekBar1.getSelectedMaxValue()==HMaxValue) &&
-                        (mSeekBar2.getSelectedMaxValue()==RGBMaxValue) &&
-                        (mSeekBar3.getSelectedMaxValue()==RGBMaxValue));
-            case 2: // CMYK
-                inactive = ((mSeekBar1.getSelectedMinValue()==0) &&
-                        (mSeekBar2.getSelectedMinValue()==0) &&
-                        (mSeekBar3.getSelectedMinValue()==0) &&
-                        (mSeekBar4.getSelectedMinValue()==0) &&
-                        (mSeekBar1.getSelectedMaxValue()==RGBMaxValue) &&
-                        (mSeekBar2.getSelectedMaxValue()==RGBMaxValue) &&
-                        (mSeekBar3.getSelectedMaxValue()==RGBMaxValue) &&
-                        (mSeekBar4.getSelectedMaxValue()==RGBMaxValue));
-                break;
-            default:
-                break;
-        }
-
-        return inactive;
     }
 
     // Change colorbars based on chosen color scheme
