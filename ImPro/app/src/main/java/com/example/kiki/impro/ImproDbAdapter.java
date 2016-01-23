@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 
 public class ImproDbAdapter {
@@ -17,7 +18,7 @@ public class ImproDbAdapter {
     public static final String KEY_FILENAME = "filename";
     public static final String KEY_QUALITY = "quality";
     public static final String KEY_TYPE = "type";
-    public static final String KEY_VALUES = "values";
+    public static final String KEY_FILTERSETTINGS = "filtersettings";
     public static final String KEY_ROWID = "_id";
 
     private DatabaseHelper mDbHelper;
@@ -25,11 +26,12 @@ public class ImproDbAdapter {
 
     private static final String DATABASE_CREATE =
             "create table " + DATABASE_TABLE + " ("
-                    + KEY_ROWID + " integer primary key autoincrement, "
+                    + KEY_ROWID + " integer PRIMARY KEY autoincrement, "
                     + KEY_FILENAME + " text not null, "
                     + KEY_QUALITY + " integer not null, "
                     + KEY_TYPE + " text not null, "
-                    + KEY_VALUES + "text not null);";
+                    + KEY_FILTERSETTINGS + " text not null, "
+                    + "UNIQUE (" + KEY_FILENAME + "));";
 
     private final Context mCtx;
 
@@ -69,7 +71,7 @@ public class ImproDbAdapter {
     public long createFilter(String filename, int quality, String type, int[] values){
         // check if filename is already in table
         Cursor mCursor = fetchFilter(filename);
-        if (mCursor == null) {
+        if (mCursor == null || mCursor.getCount() == 0) {
             ContentValues initialValues = new ContentValues();
             initialValues.put(KEY_FILENAME,filename);
             initialValues.put(KEY_QUALITY,quality);
@@ -80,7 +82,7 @@ public class ImproDbAdapter {
             for (int i = 0; i<values.length; i++) {
                 values_str+=String.valueOf(values[i])+" ";
             }
-            initialValues.put(KEY_VALUES, values_str);
+            initialValues.put(KEY_FILTERSETTINGS, values_str);
 
             return mDb.insert(DATABASE_TABLE, null, initialValues);
         }
@@ -88,6 +90,7 @@ public class ImproDbAdapter {
             // filename is already in table
             mCursor.moveToFirst();
             int index = mCursor.getColumnIndexOrThrow(KEY_ROWID);
+            Log.e("TAG", "index: " + String.valueOf(index) + " " + String.valueOf(mCursor.getCount()));
             long rowID = mCursor.getLong(index);
             updateFilter(rowID, filename,quality,type,values);
 
@@ -101,13 +104,16 @@ public class ImproDbAdapter {
 
     public Cursor fetchAllFilters(){
         return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_FILENAME,
-                KEY_QUALITY, KEY_TYPE, KEY_VALUES}, null, null, null, null, null);
+                KEY_QUALITY, KEY_TYPE, KEY_FILTERSETTINGS}, null, null, null, null, null);
     }
 
     public Cursor fetchFilter(String filename) throws SQLException {
-        Cursor mCursor = mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID, KEY_FILENAME,
-                        KEY_QUALITY, KEY_TYPE, KEY_VALUES},KEY_FILENAME + "='" + filename +"'", null, null,
-                null, null, null);
+        Cursor mCursor = mDb.query(true, DATABASE_TABLE, new String[] {
+                        KEY_ROWID, KEY_FILENAME,
+                        KEY_QUALITY, KEY_TYPE,
+                        KEY_FILTERSETTINGS},
+                        KEY_FILENAME + "=?", new String[] {filename}, null,
+                        null, null, null);
         if(mCursor != null){
             mCursor.moveToFirst();
         }
@@ -126,7 +132,7 @@ public class ImproDbAdapter {
         for (int i = 0; i<values.length; i++) {
             values_str+=String.valueOf(values[i])+" ";
         }
-        args.put(KEY_VALUES, values_str);
+        args.put(KEY_FILTERSETTINGS, values_str);
 
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }

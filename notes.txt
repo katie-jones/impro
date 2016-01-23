@@ -10,4 +10,4 @@ TODOs
 - add interface to fileopenerlist / dialog for choosing file on click.
 - don't make filtering happen all the time.
 - update quality values (log scale?) 
-
+- change so filterType is string "RGB", "HSV" etc and use enum FilterType.valueOf(...)

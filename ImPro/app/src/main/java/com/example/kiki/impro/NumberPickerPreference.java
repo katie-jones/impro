@@ -20,7 +20,7 @@ public class NumberPickerPreference extends DialogPreference {
     int mQualityValue;
     NumberPicker np;
     static private String TAG="NumberPicker";
-    static int DEFAULT_VALUE=CommonResources.DEFAULT_QUALITY;
+    static int DEFAULT_VALUE=CommonResources.PREF_QUALITY_DEFAULT;
     int minValue = 5;
     int maxValue = 100;
     int step = 5;

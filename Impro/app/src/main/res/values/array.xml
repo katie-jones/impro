@@ -45,7 +45,7 @@
 
     <string-array name="p_imagetype_entries">
         <item>PNG</item>
-        <item>JPG</item>
+        <item>JPEG</item>
         <item>WEBP</item>
     </string-array>
 

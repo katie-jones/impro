@@ -34,6 +34,8 @@ public class FileOpenerList extends ListFragment {
     private int currentPosition = 0;
     private static final String TAG_STILL_FRAGMENT="StillFragment";
 
+    private ImproDbAdapter mDbAdapter;
+
 
 
     @Override
@@ -43,7 +45,7 @@ public class FileOpenerList extends ListFragment {
         Log.e(TAG,"onCreateView");
 
         mView = inflater.inflate(R.layout.filenameopener_list, container, false);
-        String fullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()+"/"+CommonResources.directory;
+        String fullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath()+"/"+CommonResources.directory;
         currentDir = new File(fullPath+"/");
         fill(currentDir);
 

@@ -16,7 +16,7 @@
     <string name="p_color_dialog">Filtering scheme</string>
 
     <string name="p_imagetype_title">Image format</string>
-    <string name="p_imagetype_summ">Choose png, jpg or webp</string>
+    <string name="p_imagetype_summ">Choose png, jpeg or webp</string>
     <string name="p_imagetype_dialog">Image format</string>
 
 

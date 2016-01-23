@@ -96,7 +96,7 @@ public class StillFragment extends Fragment {
         // Apply filter only if a new image has been taken
         if (savedInstanceState == null) {
             // initialize filtered image and then apply filter
-            mQuality = mPrefs.getInt(PREF_QUALITY_KEY, CommonResources.DEFAULT_QUALITY);
+            mQuality = mPrefs.getInt(PREF_QUALITY_KEY, CommonResources.PREF_QUALITY_DEFAULT);
             makeReducedAndFilteredBitmaps(mQuality);
 
             startFiltering();
@@ -115,7 +115,7 @@ public class StillFragment extends Fragment {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(PREF_QUALITY_KEY)) {
-                    int newQuality = sharedPreferences.getInt(key, CommonResources.DEFAULT_QUALITY);
+                    int newQuality = sharedPreferences.getInt(key, CommonResources.PREF_QUALITY_DEFAULT);
                     if (newQuality != mQuality) {
                         mQuality = newQuality;
                         makeReducedAndFilteredBitmaps(newQuality);

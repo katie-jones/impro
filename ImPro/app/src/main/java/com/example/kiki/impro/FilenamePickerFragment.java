@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.media.MediaScannerConnection;
@@ -44,6 +45,8 @@ public class FilenamePickerFragment extends DialogFragment {
     private static final String PREF_IMAGETYPE_DEFAULT = "0";
     private static final String PREF_IMAGETYPE_KEY = "p_imagetype_key";
 
+    ImproDbAdapter mDbAdapter;
+
 
 
 
@@ -60,6 +63,8 @@ public class FilenamePickerFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         final Dialog dialog = new Dialog(this.getActivity());
         View v = inflater.inflate(R.layout.filenamepicker_fragment, container, false);
+
+        mDbAdapter = new ImproDbAdapter(getActivity());
 
         mTitle = (TextView) v.findViewById(R.id.filenamePickerTitle);
         switch(getArguments().getString("type")){
@@ -112,18 +117,52 @@ public class FilenamePickerFragment extends DialogFragment {
             }
 
             // get image type from preferences
-            CommonResources.ImageType imageFormat = CommonResources.ImageType.values()[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT))];
+            SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            CommonResources.ImageType imageFormat = CommonResources.ImageType.values()[Integer.parseInt(mPrefs.getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT))];
+            Bitmap.CompressFormat compFormat;
+            switch (imageFormat)
+            {
+                case JPG:
+                    mFilename = mFilename + ".jpeg";
+                    compFormat = Bitmap.CompressFormat.JPEG;
+                    break;
+                case WEBP:
+                    mFilename = mFilename + ".webp";
+                    compFormat = Bitmap.CompressFormat.WEBP;
+                    break;
+                default:
+                    mFilename = mFilename + ".png";
+                    compFormat = Bitmap.CompressFormat.PNG;
+                    break;
+            }
 
             mFilename = mTextBox.getText().toString();
             // save the new value
             switch(getArguments().getString("type")){
                 case "filtered":
                     CommonResources.filteredName = mFilename;
-                    mImageSaver = new ImageSaverExternal(CommonResources.filteredBitmap,mFilename,getActivity(), imageFormat);
+                    mImageSaver = new ImageSaverExternal(CommonResources.filteredBitmap,mFilename,getActivity(), compFormat);
                     break;
                 case "original":
                     CommonResources.bitmapName = mFilename;
-                    mImageSaver = new ImageSaverExternal(CommonResources.bitmap,mFilename,getActivity(), imageFormat);
+                    mImageSaver = new ImageSaverExternal(CommonResources.bitmap,mFilename,getActivity(), compFormat);
+
+                    // If saving original image, add database entry with relevant info
+                    mDbAdapter.open();
+
+                    int quality = mPrefs.getInt(CommonResources.PREF_QUALITY_KEY, CommonResources.PREF_QUALITY_DEFAULT);
+                    String filterType = mPrefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT);
+                    int[] values = CommonResources.getFilterValues(mPrefs, CommonResources.FilterType.values()[Integer.parseInt(filterType)]);
+
+                    long rowId = mDbAdapter.createFilter(mFilename, quality, filterType, values);
+                    Log.e(TAG, "New DB entry (row ID: " + String.valueOf(rowId) + ")");
+
+                    Cursor settings = mDbAdapter.fetchFilter(mFilename);
+                    String filterSettings = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_FILTERSETTINGS));
+                    Log.e(TAG, "Filter settings: " + filterSettings);
+
+                    mDbAdapter.close();
+
                     break;
                 default:
                     break;
@@ -132,6 +171,7 @@ public class FilenamePickerFragment extends DialogFragment {
 
             Thread mThread = new Thread(mImageSaver,"ImageSavingBadassMofoThread");
             mThread.start();
+
 
 
         }
@@ -143,29 +183,16 @@ public class FilenamePickerFragment extends DialogFragment {
         private final Context mContext;
         private final Bitmap.CompressFormat mFormat;
 
-        public ImageSaverExternal(Bitmap image, String file, Context context, CommonResources.ImageType imageFormat) {
-            switch (imageFormat)
-            {
-                case JPG:
-                    mFilename = file + ".jpg";
-                    mFormat = Bitmap.CompressFormat.JPEG;
-                    break;
-                case WEBP:
-                    mFilename = file + ".webp";
-                    mFormat = Bitmap.CompressFormat.WEBP;
-                    break;
-                default:
-                    mFilename = file + ".png";
-                    mFormat = Bitmap.CompressFormat.PNG;
-                    break;
-            }
+        public ImageSaverExternal(Bitmap image, String filename, Context context, Bitmap.CompressFormat imageFormat) {
+            mFormat = imageFormat;
+            mFilename = filename;
             mImage = image;
             mContext = context;
         }
 
         @Override
         public void run() {
-            String fullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()+"/"+CommonResources.directory;
+            String fullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath()+"/"+CommonResources.directory;
             try {
                 boolean result = true;
                 File dir = new File(fullPath);
