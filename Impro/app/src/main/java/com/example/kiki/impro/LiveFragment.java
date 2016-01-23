@@ -73,7 +73,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     private LiveFragmentInterface mInterface;
 
     public interface LiveFragmentInterface {
-        public void toStillFragment();
+        void toStillFragment();
     }
 
     @Override

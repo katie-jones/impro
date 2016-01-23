@@ -39,6 +39,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             Manifest.permission.CAMERA
     };
 
+
     /**
      * Checks if the app has permission to write to device storage
      *
@@ -88,6 +89,8 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             }
         }
     };
+
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         Log.e(TAG,"Save");
@@ -140,6 +143,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             transaction.commit();
         }
     }
+
 
     // interface method from live fragment: initializes both fragments
     public void onFragmentCreated(Bundle savedInstanceState) {

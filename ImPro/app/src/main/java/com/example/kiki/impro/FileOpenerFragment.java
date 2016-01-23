@@ -55,6 +55,8 @@ public class FileOpenerFragment extends DialogFragment {
         myOnAttach(activity);
 
     }
+
+
     public void myOnAttach(Activity activity) {
         // Make sure the interface ClickCallback is defined in MainActivity
         try {
@@ -77,6 +79,7 @@ public class FileOpenerFragment extends DialogFragment {
         mView = inflater.inflate(R.layout.filenameopener_dialog, null);
 
         FileOpenerList fragment = new FileOpenerList();
+        fragment.setTargetFragment(this, 0);
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.replace(R.id.fileopenerlist, fragment, TAG_FILE_FRAGMENT);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -90,18 +93,7 @@ public class FileOpenerFragment extends DialogFragment {
         mButton_Ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // return the chosen filename
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                Bitmap bitmap = BitmapFactory.decodeFile(CommonResources.file_to_be_opened, options);
-
-                // Save in common resources
-                CommonResources.bitmap = bitmap;
-
-                //TODO: change to still fragment
-                mInterface.toStillFragment();
-
-                getDialog().dismiss();
+                dismissDialogPositive();
             }
         });
 
@@ -115,5 +107,22 @@ public class FileOpenerFragment extends DialogFragment {
         });
 
         return mView;
+    }
+
+    // Function to call from FileOpenerList to dismiss the dialog
+    public void dismissDialogPositive()
+    {
+        // return the chosen filename
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(CommonResources.file_to_be_opened, options);
+
+        // Save in common resources
+        CommonResources.bitmap = bitmap;
+
+        //TODO: change to still fragment
+        mInterface.toStillFragment();
+
+        getDialog().dismiss();
     }
 }

@@ -1,6 +1,9 @@
 package com.example.kiki.impro;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -31,6 +34,8 @@ public class FileOpenerList extends ListFragment {
     private int currentPosition = 0;
     private static final String TAG_STILL_FRAGMENT="StillFragment";
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -54,8 +59,8 @@ public class FileOpenerList extends ListFragment {
 
     }
 
-    @Override
 
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Option o = adapter.getItem(position);
@@ -69,6 +74,9 @@ public class FileOpenerList extends ListFragment {
             // TODO: show that file has been clicked
             CommonResources.file_to_be_opened = o.getPath();
         }
+
+        // Dismiss parent dialog fragment
+        ((FileOpenerFragment) getTargetFragment()).dismissDialogPositive();
     }
 
     private void fill(File f)
