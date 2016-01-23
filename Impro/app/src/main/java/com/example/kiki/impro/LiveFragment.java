@@ -491,9 +491,18 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
     @Override
     public void onPause() {
+        Log.e(TAG,"on pause");
         closeCamera();
         stopBackgroundThread();
         super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.e(TAG,"on stop");
+        closeCamera();
+        stopBackgroundThread();
+        super.onStop();
     }
 
     private void requestCameraPermission() {
@@ -662,13 +671,15 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
      * Stops the list_selector thread and its {@link Handler}.
      */
     private void stopBackgroundThread() {
-        mBackgroundThread.quitSafely();
-        try {
-            mBackgroundThread.join();
-            mBackgroundThread = null;
-            mBackgroundHandler = null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (mBackgroundThread != null) {
+            mBackgroundThread.quitSafely();
+            try {
+                mBackgroundThread.join();
+                mBackgroundThread = null;
+                mBackgroundHandler = null;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

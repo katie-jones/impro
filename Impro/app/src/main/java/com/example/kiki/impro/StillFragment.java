@@ -37,7 +37,12 @@ public class StillFragment extends Fragment {
     private ImageView mImageView;
     private Button mButtonFilt;
     private Button mButtonOrig;
+    private int mQuality;
+    private SharedPreferences mPrefs;
+    private SharedPreferences.OnSharedPreferenceChangeListener mPrefsListener;
 
+
+    private final static String PREF_QUALITY_KEY = "p_quality_key";
     private final static String TAG = "StillFragment";
 
     @Override
@@ -84,31 +89,66 @@ public class StillFragment extends Fragment {
 
         });
 
+
+        // Get shared preferences
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         // Apply filter only if a new image has been taken
         if (savedInstanceState == null) {
             // initialize filtered image and then apply filter
-            SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            int mQuality = mPrefs.getInt("p_key_quality", CommonResources.DEFAULT_QUALITY);
+            mQuality = mPrefs.getInt(PREF_QUALITY_KEY, CommonResources.DEFAULT_QUALITY);
+            makeReducedAndFilteredBitmaps(mQuality);
 
-            reducedBitmap = Bitmap.createScaledBitmap(mBitmap, (mQuality * mBitmap.getWidth()) / 100, (mQuality * mBitmap.getHeight()) / 100, true);
-            filteredBitmap = Bitmap.createBitmap(reducedBitmap, 0, 0, reducedBitmap.getWidth(), reducedBitmap.getHeight(), new Matrix(), true);
-            CommonResources.reducedBitmap = reducedBitmap;
-            CommonResources.filteredBitmap = filteredBitmap;
+            startFiltering();
 
-
-            // Create new intent to filter image
-            CommonResources.filtering_toast = Toast.makeText(getActivity(), "filtering...", Toast.LENGTH_LONG);
-            CommonResources.filtering_toast.show();
-            Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
-            getActivity().startService(mServiceIntent);
         }
+
         else {
             mImageView.setImageBitmap(filteredBitmap);
         }
 
+        // Set new sharedpreferencechange listener for when quality value changes
+        // Make new reduced/filtered bitmaps
+        // Apply image view transform
+        // Apply filtering to image
+        mPrefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals(PREF_QUALITY_KEY)) {
+                    int newQuality = sharedPreferences.getInt(key, CommonResources.DEFAULT_QUALITY);
+                    if (newQuality != mQuality) {
+                        mQuality = newQuality;
+                        makeReducedAndFilteredBitmaps(newQuality);
+                        imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
+                        startFiltering();
+                        mImageView.setImageBitmap(filteredBitmap);
+                    }
+                }
+            }
+        };
+        mPrefs.registerOnSharedPreferenceChangeListener(mPrefsListener);
+
         return mView;
     }
 
+
+    private void makeReducedAndFilteredBitmaps(int quality)
+    {
+        reducedBitmap = Bitmap.createScaledBitmap(mBitmap, (quality * mBitmap.getWidth()) / 100, (quality * mBitmap.getHeight()) / 100, true);
+        filteredBitmap = Bitmap.createBitmap(reducedBitmap, 0, 0, reducedBitmap.getWidth(), reducedBitmap.getHeight(), new Matrix(), true);
+        CommonResources.reducedBitmap = reducedBitmap;
+        CommonResources.filteredBitmap = filteredBitmap;
+    }
+
+
+    private void startFiltering()
+    {
+        // Create new intent to filter image
+        CommonResources.filtering_toast = Toast.makeText(getActivity(), "filtering...", Toast.LENGTH_LONG);
+        CommonResources.filtering_toast.show();
+        Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
+        getActivity().startService(mServiceIntent);
+    }
 
 
 
@@ -120,10 +160,6 @@ public class StillFragment extends Fragment {
         // The filter's action is BROADCAST_ACTION
         IntentFilter mStatusIntentFilter = new IntentFilter(
                 CommonResources.BROADCAST_ACTION);
-
-        // Adds a data filter for the HTTP scheme
-//        mStatusIntentFilter.addDataScheme("http");
-
 
 
 
@@ -153,6 +189,7 @@ public class StillFragment extends Fragment {
     public void onDestroy() {
         // Unregister since the activity is about to be closed.
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
+        mPrefs.unregisterOnSharedPreferenceChangeListener(mPrefsListener);
         super.onDestroy();
     }
 
@@ -175,6 +212,7 @@ public class StillFragment extends Fragment {
 
 
 
+    // Calculate image transform matrix needed to apply to image view to make it fit within the view
     private void imageViewTransform(int viewWidth, int viewHeight) {
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
 
@@ -186,10 +224,6 @@ public class StillFragment extends Fragment {
 
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
-
-
-//        Log.e(TAG, "Bitmap size " + String.valueOf(mBitmap.getHeight()) + " x " + String.valueOf(mBitmap.getWidth()));
-//        Log.e(TAG, "view size " + String.valueOf(viewHeight + " x " + viewWidth));
 
         float scale;
         if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
@@ -212,31 +246,4 @@ public class StillFragment extends Fragment {
     }
 
 
-
-
-    private void cvt2RGB(Mat mMat) {
-        final int depth = 3;
-        byte[] pixelvector = new byte[depth+1];
-        byte r,g,b;
-        float c,m,y,k;
-        final float maxval = 255;
-
-        for (int i = 0; i<mMat.height(); i++) {
-            for (int j = 0; j<mMat.width(); j++) {
-                mMat.get(i,j,pixelvector);
-                c = (float)pixelvector[0]/maxval;
-                m = (float)pixelvector[1]/maxval;
-                y = (float)pixelvector[2]/maxval;
-                k = (float)pixelvector[3]/maxval;
-                r = (byte) (maxval*(1-c)*(1-k));
-                g = (byte) (maxval*(1-m)*(1-k));
-                b = (byte) (maxval*(1-y)*(1-k));
-                pixelvector[0] = r;
-                pixelvector[1] = g;
-                pixelvector[2] = b;
-                pixelvector[3] = (byte) maxval;
-                mMat.put(i,j,pixelvector);
-            }
-        }
-    }
 }
