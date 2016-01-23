@@ -7,9 +7,7 @@ errors...
 
 TODOs 
 
-- add jpg / png option
-- add listener to quality preference so that we can change it while picture has been taken
 - add interface to fileopenerlist / dialog for choosing file on click.
 - don't make filtering happen all the time.
- 
+- update quality values (log scale?) 
 

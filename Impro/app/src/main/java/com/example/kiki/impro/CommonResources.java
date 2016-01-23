@@ -41,4 +41,7 @@ public class CommonResources {
 
     public static String file_to_be_opened = "file";
 
+    // image types to be saved
+    public enum ImageType{PNG, JPG, WEBP};
+
 }

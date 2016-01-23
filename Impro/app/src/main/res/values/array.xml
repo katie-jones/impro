@@ -37,5 +37,17 @@
         <item>100%</item>
     </string-array>
 
+    <string-array name="p_imagetype_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="p_imagetype_entries">
+        <item>PNG</item>
+        <item>JPG</item>
+        <item>WEBP</item>
+    </string-array>
+
 
 </resources>

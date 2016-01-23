@@ -27,6 +27,19 @@
         android:negativeButtonText="@android:string/cancel"
         android:defaultValue="50"
         />
+
+
+    <ListPreference
+        android:key="p_imagetype_key"
+        android:title="@string/p_imagetype_title"
+        android:summary="@string/p_imagetype_summ"
+        android:dialogTitle="@string/p_imagetype_dialog"
+        android:entries="@array/p_imagetype_entries"
+        android:entryValues="@array/p_imagetype_values"
+        android:defaultValue="0"
+        android:persistent="true"
+        />
+
 </PreferenceScreen>
 
 

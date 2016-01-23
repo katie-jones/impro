@@ -3,12 +3,14 @@ package com.example.kiki.impro;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +40,11 @@ public class FilenamePickerFragment extends DialogFragment {
     Button mButton_Cancel;
     static private String TAG="FilenameFragment";
     static String DEFAULT_VALUE = "image";
+
+    private static final String PREF_IMAGETYPE_DEFAULT = "0";
+    private static final String PREF_IMAGETYPE_KEY = "p_imagetype_key";
+
+
 
 
     static FilenamePickerFragment newInstance(String type) {
@@ -103,16 +110,20 @@ public class FilenamePickerFragment extends DialogFragment {
                 Toast.makeText(getActivity(),"Filename empty. Not saving...",Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // get image type from preferences
+            CommonResources.ImageType imageFormat = CommonResources.ImageType.values()[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT))];
+
             mFilename = mTextBox.getText().toString();
             // save the new value
             switch(getArguments().getString("type")){
                 case "filtered":
                     CommonResources.filteredName = mFilename;
-                    mImageSaver = new ImageSaverExternal(CommonResources.filteredBitmap,mFilename+".png",getActivity());
+                    mImageSaver = new ImageSaverExternal(CommonResources.filteredBitmap,mFilename,getActivity(), imageFormat);
                     break;
                 case "original":
                     CommonResources.bitmapName = mFilename;
-                    mImageSaver = new ImageSaverExternal(CommonResources.bitmap,mFilename+".png",getActivity());
+                    mImageSaver = new ImageSaverExternal(CommonResources.bitmap,mFilename,getActivity(), imageFormat);
                     break;
                 default:
                     break;
@@ -122,25 +133,33 @@ public class FilenamePickerFragment extends DialogFragment {
             Thread mThread = new Thread(mImageSaver,"ImageSavingBadassMofoThread");
             mThread.start();
 
-            // alert media scanner of new image file
-            MediaScannerConnection.scanFile(getActivity(), new String[]{mFilename + ".png"}, null, new MediaScannerConnection.OnScanCompletedListener() {
-                public void onScanCompleted(String path, Uri uri) {
-                    Log.i(TAG, "Scanned " + path + ":");
-                    Log.i(TAG, "uri=" + uri);
-                }
-            });
+
         }
     }
 
     private static class ImageSaverExternal implements Runnable {
-        //The JPEG image
         private final Bitmap mImage;
         private final String mFilename;
         private final Context mContext;
+        private final Bitmap.CompressFormat mFormat;
 
-        public ImageSaverExternal(Bitmap image, String file, Context context) {
+        public ImageSaverExternal(Bitmap image, String file, Context context, CommonResources.ImageType imageFormat) {
+            switch (imageFormat)
+            {
+                case JPG:
+                    mFilename = file + ".jpg";
+                    mFormat = Bitmap.CompressFormat.JPEG;
+                    break;
+                case WEBP:
+                    mFilename = file + ".webp";
+                    mFormat = Bitmap.CompressFormat.WEBP;
+                    break;
+                default:
+                    mFilename = file + ".png";
+                    mFormat = Bitmap.CompressFormat.PNG;
+                    break;
+            }
             mImage = image;
-            mFilename = file;
             mContext = context;
         }
 
@@ -155,13 +174,13 @@ public class FilenamePickerFragment extends DialogFragment {
                 }
                 if (result) {
 
-                    OutputStream fOut = null;
+                    OutputStream fOut;
                     File file = new File(fullPath, mFilename);
                     boolean existant = file.createNewFile();
 
                     fOut = new FileOutputStream(file);
 
-                    mImage.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                    mImage.compress(mFormat, 100, fOut);
                     fOut.flush();
                     fOut.close();
 
@@ -177,6 +196,14 @@ public class FilenamePickerFragment extends DialogFragment {
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
+
+            // alert media scanner of new image file
+            MediaScannerConnection.scanFile(mContext, new String[]{mFilename}, null, new MediaScannerConnection.OnScanCompletedListener() {
+                public void onScanCompleted(String path, Uri uri) {
+                    Log.i(TAG, "Scanned " + path + ":");
+                    Log.i(TAG, "uri=" + uri);
+                }
+            });
         }
     }
 }
