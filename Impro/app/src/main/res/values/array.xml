@@ -1,8 +1,8 @@
 <resources>
     <string-array name="p_color_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+        <item>RGB</item>
+        <item>HSV</item>
+        <item>CMYK</item>
     </string-array>
 
     <string-array name="p_color_entries">

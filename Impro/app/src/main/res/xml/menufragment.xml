@@ -14,7 +14,7 @@
         android:dialogTitle="@string/p_color_dialog"
         android:entries="@array/p_color_entries"
         android:entryValues="@array/p_color_values"
-        android:defaultValue="0"
+        android:defaultValue="RGB"
         android:persistent="true"
         />
 

@@ -40,6 +40,8 @@ public class StillFragment extends Fragment {
     private int mQuality;
     private SharedPreferences mPrefs;
 
+    boolean viewCreated = false;
+
 
     private final static String PREF_QUALITY_KEY = "p_quality_key";
     private final static String TAG = "StillFragment";
@@ -70,6 +72,8 @@ public class StillFragment extends Fragment {
             }
         });
 
+        viewCreated = false;
+
 
         // use global layout listener to find when view sizes have been assigned so we can
         // determine size of image view and apply appropriate transformation
@@ -83,6 +87,7 @@ public class StillFragment extends Fragment {
                 obs.removeOnGlobalLayoutListener(this);
 
                 imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
+                viewCreated = true;
 
             }
 
@@ -113,7 +118,7 @@ public class StillFragment extends Fragment {
     // Update quality value of image
     public void changeQuality(int newQuality)
     {
-        if (newQuality != mQuality) {
+        if (newQuality != mQuality && viewCreated) {
             mQuality = newQuality;
             makeReducedAndFilteredBitmaps(newQuality);
             imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
@@ -158,6 +163,8 @@ public class StillFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mReceiver,
                 mStatusIntentFilter);
+
+        viewCreated = false;
     }
 
     public void save_image(String type) {
@@ -172,6 +179,12 @@ public class StillFragment extends Fragment {
         // Create and show the dialog.
         DialogFragment newFragment = FilenamePickerFragment.newInstance(type);
         newFragment.show(ft, "FilenameFragment");
+    }
+
+    @Override
+    public void onPause() {
+        viewCreated = false;
+        super.onPause();
     }
 
 

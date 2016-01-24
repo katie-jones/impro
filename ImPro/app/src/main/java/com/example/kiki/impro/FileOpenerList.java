@@ -77,8 +77,6 @@ public class FileOpenerList extends ListFragment {
         }
         else
         {
-            Toast.makeText(this.getActivity(), "File Clicked: "+o.getPath(), Toast.LENGTH_SHORT).show();
-            // TODO: show that file has been clicked
             CommonResources.file_to_be_opened = o.getPath();
 
             // Dismiss parent dialog fragment
@@ -87,30 +85,33 @@ public class FileOpenerList extends ListFragment {
             mDbAdapter.open();
 
             Cursor settings = mDbAdapter.fetchFilter(o.getName());
-            int quality = settings.getInt(settings.getColumnIndexOrThrow(mDbAdapter.KEY_QUALITY));
-            String filterSettings = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_FILTERSETTINGS));
-            String imageFormat = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_TYPE));
+            if (settings != null && settings.getCount() > 0) {
+                // get settings from database
+                int quality = settings.getInt(settings.getColumnIndexOrThrow(mDbAdapter.KEY_QUALITY));
+                String filterSettings = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_FILTERSETTINGS));
+                String imageFormat = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_TYPE));
 
+                // convert string filterSettings to int[]
+                String[] filters_string = filterSettings.split(" ");
+                int[] filters = new int[filters_string.length];
+                for (int i = 0; i < filters.length; i++) {
+                    filters[i] = Integer.parseInt(filters_string[i]);
+                }
+
+                // update shared preferences
+                SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor mEditor = mPrefs.edit();
+
+                mEditor.putString(CommonResources.PREF_FILTERTYPE_KEY, imageFormat);
+                mEditor.putInt(CommonResources.PREF_QUALITY_KEY, quality);
+
+                for (int i = 0; i < filters.length; i++) {
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + String.valueOf(i), filters[i]);
+                }
+
+                mEditor.apply();
+            }
             mDbAdapter.close();
-
-            String[] filters_string = filterSettings.split(" ");
-            int[] filters = new int[filters_string.length];
-
-            for (int i=0; i<filters.length; i++) {
-                filters[i] = Integer.parseInt(filters_string[i]);
-            }
-
-            SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            SharedPreferences.Editor mEditor = mPrefs.edit();
-
-            mEditor.putString(CommonResources.PREF_FILTERTYPE_KEY, imageFormat);
-            mEditor.putInt(CommonResources.PREF_QUALITY_KEY, quality);
-
-            for (int i=0; i<filters.length; i++) {
-                mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + String.valueOf(i), filters[i]);
-            }
-
-            mEditor.apply();
 
         }
 

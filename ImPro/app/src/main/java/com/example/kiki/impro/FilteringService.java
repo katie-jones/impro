@@ -30,7 +30,7 @@ public class FilteringService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent workIntent) {
-        Log.e(TAG,"Start filtering service");
+        Log.e(TAG, "Start filtering service");
 
         applyFilter();
 
@@ -51,7 +51,8 @@ public class FilteringService extends IntentService {
         int depth = 3;
 
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
+        CommonResources.FilterType type = CommonResources.getFilterType(mPrefs);
+//        int type = Integer.parseInt(mPrefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT));
 
         Mat mMat = new Mat(height,width, CvType.CV_8UC4,new Scalar(0));
         Mat mOrigMat = new Mat(height,width, CvType.CV_8UC4,new Scalar(0));
@@ -64,22 +65,19 @@ public class FilteringService extends IntentService {
         byte[] zeros = new byte[0];
 
         switch (type) {
-            case 0: // RGB
-                Log.e(TAG, "RGB");
+            case RGB: // RGB
                 depth = 3;
                 pixelvector = new byte[depth+1];
                 zeros = new byte[depth+1];
                 colorMat = mMat;
                 break;
-            case 1: // HSV
-                Log.e(TAG, "HSV");
+            case HSV: // HSV
                 Imgproc.cvtColor(mMat, colorMat, Imgproc.COLOR_RGB2HSV);
                 depth = 3;
                 pixelvector = new byte[depth];
                 zeros = new byte[depth+1];
                 break;
-            case 2: // CMYK
-                Log.e(TAG,"CMYK");
+            case CMYK: // CMYK
                 cvt2CMYK(mMat, colorMat);
                 depth = 4;
                 pixelvector = new byte[depth];
@@ -87,7 +85,7 @@ public class FilteringService extends IntentService {
         }
 
         // Read min and max filter values and check if filter has to be applied
-        final int[] filterSettings = CommonResources.getFilterValues(mPrefs, CommonResources.FilterType.values()[type]);
+        final int[] filterSettings = CommonResources.getFilterValues(mPrefs, type);
         int[] lower_array = new int[depth];
         int[] upper_array = new int[depth];
         boolean do_filtering = false;
@@ -95,7 +93,7 @@ public class FilteringService extends IntentService {
         for (int k=0; k<depth;k++) {
             lower_array[k] = filterSettings[k];
             upper_array[k] = filterSettings[k+CommonResources.N_FILTERS];
-            if (type == 1 && k==0) {
+            if (type == CommonResources.FilterType.HSV && k==0) {
                 if (lower_array[k]>0 || upper_array[k]<ColorbarFragment.HMaxValue) {
                     do_filtering = true;
                 }

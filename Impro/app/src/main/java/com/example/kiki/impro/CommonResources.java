@@ -50,8 +50,10 @@ public class CommonResources {
     public static final String PREF_QUALITY_KEY = "p_quality_key";
     public static final int PREF_QUALITY_DEFAULT = 50;
     public static final String PREF_FILTERTYPE_KEY = "p_color_key";
-    public static final String PREF_FILTERTYPE_DEFAULT = "0";
+    public static final String PREF_FILTERTYPE_DEFAULT = "RGB";
     public static final String PREF_FILTERSETTINGS_KEY_ROOT = "p_filtersettings_";
+    public static final String PREF_IMAGETYPE_KEY = "p_imagetype_key";
+    public static final String PREF_IMAGETYPE_DEFAULT = "0";
 
 
     // Method to return the filter values from prefs as an integer array
@@ -75,4 +77,27 @@ public class CommonResources {
         }
         return values;
     }
+
+
+//    // Method to return the image type from prefs
+//    public static ImageType getImageType(SharedPreferences prefs)
+//    {
+//        String type = prefs.getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT);
+//        return ImageType.valueOf(type);
+//    }
+
+    // Method to return the filter type from prefs
+    public static FilterType getFilterType(SharedPreferences prefs)
+    {
+        String type = prefs.getString(PREF_FILTERTYPE_KEY, PREF_FILTERTYPE_DEFAULT);
+        FilterType filterType;
+        try {
+            filterType = FilterType.valueOf(type);
+        }
+        catch (IllegalArgumentException e) {
+            filterType = FilterType.valueOf(PREF_FILTERTYPE_DEFAULT);
+        }
+        return filterType;
+    }
+
 }

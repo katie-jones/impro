@@ -45,7 +45,7 @@ public class ColorbarFragment extends Fragment {
         mView = inflater.inflate(R.layout.colorbarfragment, container, false);
 
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        final int filter_type = Integer.parseInt(mPrefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT));
+        CommonResources.FilterType filter_type = CommonResources.getFilterType(mPrefs);
 
         mSeekBar1 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar1);
         mSeekBar2 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar2);
@@ -57,7 +57,7 @@ public class ColorbarFragment extends Fragment {
         mText3 = (TextView) mView.findViewById(R.id.colortext3);
         mText4 = (TextView) mView.findViewById(R.id.colortext4);
 
-        int[] filter_settings = CommonResources.getFilterValues(mPrefs, CommonResources.FilterType.values()[filter_type]);
+        int[] filter_settings = CommonResources.getFilterValues(mPrefs, filter_type);
 
         setValues(filter_settings);
 
@@ -111,19 +111,19 @@ public class ColorbarFragment extends Fragment {
     }
 
     // Change colorbars based on chosen color scheme
-    public void setColorbarType (int type) {
+    public void setColorbarType (CommonResources.FilterType type) {
         // use RGB limits and no 4th colorbar by default
         mSeekBar1.setRangeValues(0, RGBMaxValue);
         mSeekBar4.setVisibility(View.INVISIBLE);
 
         switch (type) {
-            case 0: // RGB
+            case RGB:
                 mText1.setText("R");
                 mText2.setText("G");
                 mText3.setText("B");
                 mText4.setText("");
                 break;
-            case 1: // HSV
+            case HSV:
                 mText1.setText("H");
                 mText2.setText("S");
                 mText3.setText("V");
@@ -134,7 +134,7 @@ public class ColorbarFragment extends Fragment {
                 if (mSeekBar1.getSelectedMaxValue() > HMaxValue)
                     mSeekBar1.setSelectedMaxValue(HMaxValue);
                 break;
-            case 2: // CMYK
+            case CMYK:
                 mText1.setText("C");
                 mText2.setText("M");
                 mText3.setText("Y");

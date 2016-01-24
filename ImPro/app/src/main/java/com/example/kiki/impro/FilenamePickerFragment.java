@@ -153,10 +153,12 @@ public class FilenamePickerFragment extends DialogFragment {
                     mDbAdapter.open();
 
                     int quality = mPrefs.getInt(CommonResources.PREF_QUALITY_KEY, CommonResources.PREF_QUALITY_DEFAULT);
-                    String filterType = mPrefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT);
-                    int[] values = CommonResources.getFilterValues(mPrefs, CommonResources.FilterType.values()[Integer.parseInt(filterType)]);
+//                    String filterType = mPrefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT);
+//                    int[] values = CommonResources.getFilterValues(mPrefs, CommonResources.FilterType.values()[Integer.parseInt(filterType)]);
+                    CommonResources.FilterType filterType = CommonResources.getFilterType(mPrefs);
+                    int[] values = CommonResources.getFilterValues(mPrefs, filterType);
 
-                    long rowId = mDbAdapter.createFilter(mFilename, quality, filterType, values);
+                    long rowId = mDbAdapter.createFilter(mFilename, quality, filterType.toString(), values);
                     Log.e(TAG, "New DB entry (row ID: " + String.valueOf(rowId) + ")");
 
 
