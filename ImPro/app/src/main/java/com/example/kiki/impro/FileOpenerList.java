@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListFragment;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -49,6 +50,8 @@ public class FileOpenerList extends ListFragment {
         currentDir = new File(fullPath+"/");
         fill(currentDir);
 
+        mDbAdapter = new ImproDbAdapter(getActivity());
+
         return mView;
     }
 
@@ -75,10 +78,22 @@ public class FileOpenerList extends ListFragment {
             Toast.makeText(this.getActivity(), "File Clicked: "+o.getPath(), Toast.LENGTH_SHORT).show();
             // TODO: show that file has been clicked
             CommonResources.file_to_be_opened = o.getPath();
+
+            // Dismiss parent dialog fragment
+            ((FileOpenerFragment) getTargetFragment()).dismissDialogPositive();
+
+            mDbAdapter.open();
+
+            Cursor settings = mDbAdapter.fetchFilter(o.getName());
+            int quality = settings.getInt(settings.getColumnIndexOrThrow(mDbAdapter.KEY_QUALITY));
+            String filterSettings = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_FILTERSETTINGS));
+            Log.e(TAG, "Filter settings: " + filterSettings + " quality: " + String.valueOf(quality));
+
+            mDbAdapter.close();
         }
 
-        // Dismiss parent dialog fragment
-        ((FileOpenerFragment) getTargetFragment()).dismissDialogPositive();
+
+
     }
 
     private void fill(File f)

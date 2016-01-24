@@ -116,6 +116,8 @@ public class FilenamePickerFragment extends DialogFragment {
                 return;
             }
 
+            mFilename = mTextBox.getText().toString();
+
             // get image type from preferences
             SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             CommonResources.ImageType imageFormat = CommonResources.ImageType.values()[Integer.parseInt(mPrefs.getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT))];
@@ -136,7 +138,7 @@ public class FilenamePickerFragment extends DialogFragment {
                     break;
             }
 
-            mFilename = mTextBox.getText().toString();
+
             // save the new value
             switch(getArguments().getString("type")){
                 case "filtered":
@@ -157,9 +159,6 @@ public class FilenamePickerFragment extends DialogFragment {
                     long rowId = mDbAdapter.createFilter(mFilename, quality, filterType, values);
                     Log.e(TAG, "New DB entry (row ID: " + String.valueOf(rowId) + ")");
 
-                    Cursor settings = mDbAdapter.fetchFilter(mFilename);
-                    String filterSettings = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_FILTERSETTINGS));
-                    Log.e(TAG, "Filter settings: " + filterSettings);
 
                     mDbAdapter.close();
 
