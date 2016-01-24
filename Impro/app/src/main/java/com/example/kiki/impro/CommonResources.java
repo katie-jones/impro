@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Environment;
 import android.widget.Toast;
 
 /**
@@ -36,7 +37,8 @@ public class CommonResources {
     // filename for original image
     public static String bitmapName;
 
-    public static String directory = "ImPro";
+    public static final String PARENT_DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+    public static final String directory = "ImPro";
 
     public static String file_to_be_opened = "file";
 

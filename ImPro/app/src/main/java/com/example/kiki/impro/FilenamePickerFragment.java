@@ -117,6 +117,7 @@ public class FilenamePickerFragment extends DialogFragment {
             }
 
             mFilename = mTextBox.getText().toString();
+            String mTextFilename = mFilename + ".txt";
 
             // get image type from preferences
             SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -139,12 +140,53 @@ public class FilenamePickerFragment extends DialogFragment {
                     break;
             }
 
+            CommonResources.FilterType filterType = CommonResources.getFilterType(mPrefs);
+            int[] values = CommonResources.getFilterValues(mPrefs, filterType);
+
 
             // save the new value
             switch(getArguments().getString("type")){
                 case "filtered":
                     CommonResources.filteredName = mFilename;
                     mImageSaver = new ImageSaverExternal(CommonResources.filteredBitmap,mFilename,getActivity(), compFormat);
+
+                    // If saving filtered image, add txt file with filter settings
+                    String fullPath = CommonResources.PARENT_DIRECTORY + "/" + CommonResources.directory;
+
+                    boolean result = true;
+                    File dir = new File(fullPath);
+                    if (!dir.exists()) {
+                        result = dir.mkdirs();
+                    }
+                    if (result) {
+                        File txt_file = new File(fullPath + "/" + mTextFilename);
+                        FileOutputStream writer;
+                        try {
+                            writer = new FileOutputStream(txt_file, false);
+
+                            // convert array into string
+                            String values_str = "";
+                            for (int i = 0; i < values.length; i++) {
+                                values_str += String.valueOf(values[i]) + " ";
+                            }
+
+
+                            String toWrite = "Image filename: " + mFilename + "\n"
+                                    + "Filter type: " + filterType.toString() + "\n"
+                                    + "Filter values: " + values_str + "\n"
+                                    + "(Filter values are given as lower bounds followed by upper bounds. " +
+                                    String.valueOf(CommonResources.N_FILTERS) + " bounds are always given." +
+                                    " For certain filters, some of these bounds may be unused (for example RGB filters only use 3).)\n";
+
+                            writer.write(toWrite.getBytes());
+                            writer.flush();
+                            writer.close();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     break;
                 case "original":
                     CommonResources.bitmapName = mFilename;
@@ -156,8 +198,7 @@ public class FilenamePickerFragment extends DialogFragment {
                     int quality = mPrefs.getInt(CommonResources.PREF_QUALITY_KEY, CommonResources.PREF_QUALITY_DEFAULT);
 //                    String filterType = mPrefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT);
 //                    int[] values = CommonResources.getFilterValues(mPrefs, CommonResources.FilterType.values()[Integer.parseInt(filterType)]);
-                    CommonResources.FilterType filterType = CommonResources.getFilterType(mPrefs);
-                    int[] values = CommonResources.getFilterValues(mPrefs, filterType);
+
 
                     long rowId = mDbAdapter.createFilter(mFilename, quality, filterType.toString(), values);
                     Log.e(TAG, "New DB entry (row ID: " + String.valueOf(rowId) + ")");
@@ -194,7 +235,7 @@ public class FilenamePickerFragment extends DialogFragment {
 
         @Override
         public void run() {
-            String fullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath()+"/"+CommonResources.directory;
+            String fullPath = CommonResources.PARENT_DIRECTORY + "/" + CommonResources.directory;
             try {
                 boolean result = true;
                 File dir = new File(fullPath);
