@@ -44,12 +44,14 @@ public class CommonResources {
 
     // filter types used
     public enum FilterType{RGB, HSV, CMYK};
+    public static final int N_FILTERS = 4;
 
     // Preferences shit
-    public static String PREF_QUALITY_KEY = "p_quality_key";
-    public static int PREF_QUALITY_DEFAULT = 50;
-    public static String PREF_FILTERTYPE_KEY = "p_color_key";
-    public static String PREF_FILTERTYPE_DEFAULT = "0";
+    public static final String PREF_QUALITY_KEY = "p_quality_key";
+    public static final int PREF_QUALITY_DEFAULT = 50;
+    public static final String PREF_FILTERTYPE_KEY = "p_color_key";
+    public static final String PREF_FILTERTYPE_DEFAULT = "0";
+    public static final String PREF_FILTERSETTINGS_KEY_ROOT = "p_filtersettings_";
 
 
     // Method to return the filter values from prefs as an integer array
@@ -58,19 +60,17 @@ public class CommonResources {
     //      entries 4-7: upper values in order (entry 7 is 0 for RGB, HSV)
     public static int[] getFilterValues(SharedPreferences prefs, FilterType type)
     {
-        int depth = 4;
-
-        int HMaxValue = 180;
-        int RGBMaxValue = 255;
+        final int depth = N_FILTERS;
 
         int[] values = new int[2*depth];
 
-        for (int k=0; k<depth;k++) {
-            values[k] = prefs.getInt("lower" + String.valueOf(k + 1), 0);
+        for (int k=0; k<depth; k++) {
+            values[k] = prefs.getInt(PREF_FILTERSETTINGS_KEY_ROOT + String.valueOf(k), 0);
             if (type == FilterType.HSV && k == 0) {
-                values[k+depth] = prefs.getInt("upper" + String.valueOf(k + 1), HMaxValue);
-            } else {
-                values[k+depth] = prefs.getInt("upper" + String.valueOf(k + 1), RGBMaxValue);
+                values[k+depth] = prefs.getInt(PREF_FILTERSETTINGS_KEY_ROOT + String.valueOf(k + depth), ColorbarFragment.HMaxValue);
+            }
+            else {
+                values[k+depth] = prefs.getInt(PREF_FILTERSETTINGS_KEY_ROOT + String.valueOf(k + depth), ColorbarFragment.RGBMaxValue);
             }
         }
         return values;

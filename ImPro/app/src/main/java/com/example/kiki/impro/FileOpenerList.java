@@ -100,16 +100,14 @@ public class FileOpenerList extends ListFragment {
                 filters[i] = Integer.parseInt(filters_string[i]);
             }
 
-            Log.e(TAG, "Filter settings: " + filterSettings + " quality: " + String.valueOf(quality) + " format: " + imageFormat);
             SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             SharedPreferences.Editor mEditor = mPrefs.edit();
 
             mEditor.putString(CommonResources.PREF_FILTERTYPE_KEY, imageFormat);
             mEditor.putInt(CommonResources.PREF_QUALITY_KEY, quality);
 
-            for (int i=0; i<4; i++) {
-                mEditor.putInt("lower" + String.valueOf(i), filters[i]);
-                mEditor.putInt("upper" + String.valueOf(i), filters[4+i]);
+            for (int i=0; i<filters.length; i++) {
+                mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + String.valueOf(i), filters[i]);
             }
 
             mEditor.apply();

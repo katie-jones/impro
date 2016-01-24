@@ -21,9 +21,6 @@ import org.opencv.imgproc.Imgproc;
  */
 
 public class FilteringService extends IntentService {
-    private final int HMaxValue = 180;
-    private final int RGBMaxValue = 255;
-    private Bitmap filteredBitmap;
     private final String TAG = "filtering_service";
 
 
@@ -35,12 +32,8 @@ public class FilteringService extends IntentService {
     protected void onHandleIntent(Intent workIntent) {
         Log.e(TAG,"Start filtering service");
 
-        // Start filtering from original bitmap
-//        filteredBitmap = CommonResources.bitmap;
-        //filteredBitmap = CommonResources.filteredBitmap;
         applyFilter();
-        //CommonResources.filteredBitmap = filteredBitmap;
-        Log.e(TAG,"Finish applying filter");
+
         int status = 0; // status to broadcast - 0 is no error
 
         Intent localIntent =
@@ -63,8 +56,7 @@ public class FilteringService extends IntentService {
         Mat mMat = new Mat(height,width, CvType.CV_8UC4,new Scalar(0));
         Mat mOrigMat = new Mat(height,width, CvType.CV_8UC4,new Scalar(0));
         Mat colorMat = new Mat(height,width,CvType.CV_8UC4,new Scalar(0));
-        //Utils.bitmapToMat(filteredBitmap, mMat);
-        //TEST:
+
         Utils.bitmapToMat(CommonResources.reducedBitmap,mOrigMat);
         mOrigMat.copyTo(mMat);
 
@@ -94,34 +86,31 @@ public class FilteringService extends IntentService {
                 zeros = new byte[depth];
         }
 
-        // Read min and max filter values and check if filter has to be applied.
+        // Read min and max filter values and check if filter has to be applied
+        final int[] filterSettings = CommonResources.getFilterValues(mPrefs, CommonResources.FilterType.values()[type]);
         int[] lower_array = new int[depth];
         int[] upper_array = new int[depth];
         boolean do_filtering = false;
+
         for (int k=0; k<depth;k++) {
-            lower_array[k] = mPrefs.getInt("lower"+String.valueOf(k+1), 0);
+            lower_array[k] = filterSettings[k];
+            upper_array[k] = filterSettings[k+CommonResources.N_FILTERS];
             if (type == 1 && k==0) {
-                upper_array[k] = mPrefs.getInt("upper"+String.valueOf(k+1), HMaxValue);
-                if (lower_array[k]>0 || upper_array[k]<HMaxValue) {
+                if (lower_array[k]>0 || upper_array[k]<ColorbarFragment.HMaxValue) {
                     do_filtering = true;
                 }
             }
             else {
-                upper_array[k] = mPrefs.getInt("upper"+String.valueOf(k+1), RGBMaxValue);
-                if (lower_array[k]>0 || upper_array[k]<RGBMaxValue) {
+                if (lower_array[k]>0 || upper_array[k]<ColorbarFragment.RGBMaxValue) {
                     do_filtering = true;
                 }
             }
-//            Log.e(TAG,"lower"+String.valueOf(lower_array[k]));
-//            Log.e(TAG,"upper"+String.valueOf(upper_array[k]));
-
-
         }
+
+
 
         // Filter out colors of interest
         if (do_filtering) {
-            Log.e(TAG,"filtering");
-
             boolean inrange;
             int this_pix;
 
@@ -133,15 +122,15 @@ public class FilteringService extends IntentService {
                     for (int k = 0; k<depth; k++) {
                         // convert signed byte into unsigned integer
                         this_pix = ((int) pixelvector[k]) & 0xFF;
-//                    if ((j==0) && (i==0)) {
-//                        Log.e(TAG, "pixel " + String.valueOf(pixelvector[k]));
-//                        Log.e(TAG, "pixel int " + String.valueOf(this_pix));
-//                    }
+
+                        // check if value of this pixel is out of range
                         if ((this_pix > upper_array[k]) || this_pix < lower_array[k]) {
                             inrange=false;
                             break;
                         }
                     }
+
+                    // if pixel(i,j) was out of range, put zeros. else don't modify the pixel.
                     if (!inrange) {
                         mMat.put(i, j, zeros);
                     }

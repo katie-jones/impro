@@ -177,9 +177,17 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 
-        if (key.equals("p_color_key")) {
-            int type = Integer.parseInt(prefs.getString("p_color_key", "0"));
+        if (key.equals(CommonResources.PREF_FILTERTYPE_KEY)) {
+            int type = Integer.parseInt(prefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT));
             mColorbarFragment.setColorbarType(type);
+            return;
+        }
+
+        if (key.contains(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT)) {
+            final int filter_type = Integer.parseInt(prefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT));
+            final int[] filter_settings = CommonResources.getFilterValues(prefs, CommonResources.FilterType.values()[filter_type]);
+
+            mColorbarFragment.setValues(filter_settings);
         }
     }
 }

@@ -35,8 +35,8 @@ public class ColorbarFragment extends Fragment {
     private View mView;
     private RangeSeekBar<Integer> mSeekBar1,mSeekBar2,mSeekBar3,mSeekBar4;
     private TextView mText1,mText2,mText3,mText4;
-    public final int HMaxValue = 180;
-    public final int RGBMaxValue = 255;
+    public static final int HMaxValue = 180;
+    public static final int RGBMaxValue = 255;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,7 +45,7 @@ public class ColorbarFragment extends Fragment {
         mView = inflater.inflate(R.layout.colorbarfragment, container, false);
 
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        final int type = Integer.parseInt(mPrefs.getString("p_color_key", "0"));
+        final int filter_type = Integer.parseInt(mPrefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT));
 
         mSeekBar1 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar1);
         mSeekBar2 = (RangeSeekBar<Integer>) mView.findViewById(R.id.seekbar2);
@@ -57,56 +57,37 @@ public class ColorbarFragment extends Fragment {
         mText3 = (TextView) mView.findViewById(R.id.colortext3);
         mText4 = (TextView) mView.findViewById(R.id.colortext4);
 
+        int[] filter_settings = CommonResources.getFilterValues(mPrefs, CommonResources.FilterType.values()[filter_type]);
 
+        setValues(filter_settings);
 
-        mSeekBar1.setSelectedMinValue(mPrefs.getInt("lower1", 0));
-        mSeekBar2.setSelectedMinValue(mPrefs.getInt("lower2", 0));
-        mSeekBar3.setSelectedMinValue(mPrefs.getInt("lower3", 0));
-        mSeekBar4.setSelectedMinValue(mPrefs.getInt("lower4", 0));
-
-        mSeekBar1.setSelectedMaxValue(mPrefs.getInt("upper2", 255));
-        mSeekBar2.setSelectedMaxValue(mPrefs.getInt("upper2", 255));
-        mSeekBar3.setSelectedMaxValue(mPrefs.getInt("upper3", 255));
-        mSeekBar4.setSelectedMaxValue(mPrefs.getInt("upper4", 255));
-
-        setColorbarType(type);
+        setColorbarType(filter_type);
 
 
         RangeSeekBar.OnRangeSeekBarChangeListener<Integer> listener = new RangeSeekBar.OnRangeSeekBarChangeListener<Integer>() {
-            //SharedPreferences mPrefs = getActivity().getSharedPreferences("",Context.MODE_PRIVATE);
-//            SharedPreferences mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
             SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             SharedPreferences.Editor mEditor = mPrefs.edit();
-            int test;
 
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Integer minValue, Integer maxValue) {
                 RangeSeekBar<Integer> mbar = (RangeSeekBar<Integer>) bar;
                 if (mbar.getId() == mSeekBar1.getId()) {
-                    mEditor.putInt("lower1", minValue);
-                    mEditor.putInt("upper1", maxValue);
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + "0", minValue);
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + "4", maxValue);
                 }
                 if (mbar.getId() == mSeekBar2.getId()) {
-                    mEditor.putInt("lower2", minValue);
-                    mEditor.putInt("upper2", maxValue);
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + "1", minValue);
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + "5", maxValue);
                 }
                 if (mbar.getId() == mSeekBar3.getId()) {
-                    Log.e(TAG,"minValue3: "+ String.valueOf(minValue));
-                    mEditor.putInt("lower3", minValue);
-                    mEditor.putInt("upper3", maxValue);
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + "2", minValue);
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + "6", maxValue);
                 }
                 if (mbar.getId() == mSeekBar4.getId()) {
-                    Log.e(TAG,"minValue4: "+ String.valueOf(minValue));
-                    mEditor.putInt("lower4", minValue);
-                    mEditor.putInt("upper4", maxValue);
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + "3", minValue);
+                    mEditor.putInt(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT + "7", maxValue);
                 }
                 mEditor.apply();
-                // TESTING: check if shared preferences have been updated correctly
-                //SharedPreferences mPrefs2 = getActivity().getSharedPreferences("my",Context.MODE_PRIVATE);
-//                SharedPreferences mPrefs2 = getActivity().getPreferences(Context.MODE_PRIVATE);
-                //test =  mPrefs2.getInt("lower3", 0);
-                //Log.e(TAG, "lower3:" + String.valueOf(test));
-
 
                 // Dynamically apply new filter to image if in Still mode if any type is set.;
                 StillFragment mFragment = (StillFragment)getFragmentManager().findFragmentByTag("StillFragment");
@@ -168,9 +149,18 @@ public class ColorbarFragment extends Fragment {
 
     }
 
-//    @Override
-//    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-//        Log.e(TAG, "Save");
-//        super.onSaveInstanceState(savedInstanceState);
-//    }
+
+    public void setValues(int[] settings)
+    {
+        mSeekBar1.setSelectedMinValue(settings[0]);
+        mSeekBar2.setSelectedMinValue(settings[1]);
+        mSeekBar3.setSelectedMinValue(settings[2]);
+        mSeekBar4.setSelectedMinValue(settings[3]);
+
+        mSeekBar1.setSelectedMaxValue(settings[4]);
+        mSeekBar2.setSelectedMaxValue(settings[5]);
+        mSeekBar3.setSelectedMaxValue(settings[6]);
+        mSeekBar4.setSelectedMaxValue(settings[7]);
+    }
+
 }
