@@ -93,12 +93,10 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-        Log.e(TAG,"Save");
         super.onSaveInstanceState(savedInstanceState);
     }
     @Override
     public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        Log.e(TAG, "Restore");
         super.onRestoreInstanceState(savedInstanceState);
     }
     @Override
@@ -122,10 +120,8 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     }
 
     public void onButtonClicked(View v) {
-        Log.e(TAG, "button clicked");
         // Exchange current fragment with the other one.
         if (mLiveFragment.isVisible()){
-            Log.e(TAG,"live visible");
 //            LiveFragment frag = (LiveFragment) getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
 //            frag.takePicture();
             stillActive=false;
@@ -135,7 +131,6 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             frag.takePicture();
         }
         else  {
-            Log.e(TAG,"still visible");
             mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.replace(mStillFragment.getId(), mLiveFragment, TAG_LIVE_FRAGMENT);
@@ -147,7 +142,6 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
     // interface method from live fragment: initializes both fragments
     public void onFragmentCreated(Bundle savedInstanceState) {
-        Log.e(TAG,"fragment created");
         mLiveFragment = (LiveFragment) getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
         mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
         if (mLiveFragment==null)
@@ -173,7 +167,6 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
     // interface method from live fragment: send bitmap to still fragment
     public void toStillFragment() {
-        Log.e(TAG,"to still fragment");
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(mLiveFragment.getId(), mStillFragment, TAG_STILL_FRAGMENT);
         stillActive=true;
@@ -183,7 +176,6 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     // method for menu fragment
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-        Log.e(TAG, "onSharedPreferenceChange");
 
         if (key.equals("p_color_key")) {
             int type = Integer.parseInt(prefs.getString("p_color_key", "0"));

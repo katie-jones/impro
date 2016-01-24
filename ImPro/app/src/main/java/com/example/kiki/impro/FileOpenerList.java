@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,9 +89,31 @@ public class FileOpenerList extends ListFragment {
             Cursor settings = mDbAdapter.fetchFilter(o.getName());
             int quality = settings.getInt(settings.getColumnIndexOrThrow(mDbAdapter.KEY_QUALITY));
             String filterSettings = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_FILTERSETTINGS));
-            Log.e(TAG, "Filter settings: " + filterSettings + " quality: " + String.valueOf(quality));
+            String imageFormat = settings.getString(settings.getColumnIndexOrThrow(mDbAdapter.KEY_TYPE));
 
             mDbAdapter.close();
+
+            String[] filters_string = filterSettings.split(" ");
+            int[] filters = new int[filters_string.length];
+
+            for (int i=0; i<filters.length; i++) {
+                filters[i] = Integer.parseInt(filters_string[i]);
+            }
+
+            Log.e(TAG, "Filter settings: " + filterSettings + " quality: " + String.valueOf(quality) + " format: " + imageFormat);
+            SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences.Editor mEditor = mPrefs.edit();
+
+            mEditor.putString(CommonResources.PREF_FILTERTYPE_KEY, imageFormat);
+            mEditor.putInt(CommonResources.PREF_QUALITY_KEY, quality);
+
+            for (int i=0; i<4; i++) {
+                mEditor.putInt("lower" + String.valueOf(i), filters[i]);
+                mEditor.putInt("upper" + String.valueOf(i), filters[4+i]);
+            }
+
+            mEditor.apply();
+
         }
 
 

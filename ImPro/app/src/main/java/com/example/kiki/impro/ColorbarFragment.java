@@ -35,8 +35,8 @@ public class ColorbarFragment extends Fragment {
     private View mView;
     private RangeSeekBar<Integer> mSeekBar1,mSeekBar2,mSeekBar3,mSeekBar4;
     private TextView mText1,mText2,mText3,mText4;
-    private final int HMaxValue = 180;
-    private final int RGBMaxValue = 255;
+    public final int HMaxValue = 180;
+    public final int RGBMaxValue = 255;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,7 +103,7 @@ public class ColorbarFragment extends Fragment {
                 mEditor.apply();
                 // TESTING: check if shared preferences have been updated correctly
                 //SharedPreferences mPrefs2 = getActivity().getSharedPreferences("my",Context.MODE_PRIVATE);
-                SharedPreferences mPrefs2 = getActivity().getPreferences(Context.MODE_PRIVATE);
+//                SharedPreferences mPrefs2 = getActivity().getPreferences(Context.MODE_PRIVATE);
                 //test =  mPrefs2.getInt("lower3", 0);
                 //Log.e(TAG, "lower3:" + String.valueOf(test));
 
