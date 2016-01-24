@@ -188,6 +188,14 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             final int[] filter_settings = CommonResources.getFilterValues(prefs, CommonResources.FilterType.values()[filter_type]);
 
             mColorbarFragment.setValues(filter_settings);
+            return;
+        }
+
+        if (key.equals(CommonResources.PREF_QUALITY_KEY)) {
+            int newQuality = prefs.getInt(key, CommonResources.PREF_QUALITY_DEFAULT);
+            if (stillActive) {
+                mStillFragment.changeQuality(newQuality);
+            }
         }
     }
 }

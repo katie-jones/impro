@@ -39,7 +39,6 @@ public class StillFragment extends Fragment {
     private Button mButtonOrig;
     private int mQuality;
     private SharedPreferences mPrefs;
-    private SharedPreferences.OnSharedPreferenceChangeListener mPrefsListener;
 
 
     private final static String PREF_QUALITY_KEY = "p_quality_key";
@@ -107,28 +106,20 @@ public class StillFragment extends Fragment {
             mImageView.setImageBitmap(filteredBitmap);
         }
 
-        // Set new sharedpreferencechange listener for when quality value changes
-        // Make new reduced/filtered bitmaps
-        // Apply image view transform
-        // Apply filtering to image
-        mPrefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals(PREF_QUALITY_KEY)) {
-                    int newQuality = sharedPreferences.getInt(key, CommonResources.PREF_QUALITY_DEFAULT);
-                    if (newQuality != mQuality) {
-                        mQuality = newQuality;
-                        makeReducedAndFilteredBitmaps(newQuality);
-                        imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
-                        startFiltering();
-                        mImageView.setImageBitmap(filteredBitmap);
-                    }
-                }
-            }
-        };
-        mPrefs.registerOnSharedPreferenceChangeListener(mPrefsListener);
 
         return mView;
+    }
+
+    // Update quality value of image
+    public void changeQuality(int newQuality)
+    {
+        if (newQuality != mQuality) {
+            mQuality = newQuality;
+            makeReducedAndFilteredBitmaps(newQuality);
+            imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
+            startFiltering();
+            mImageView.setImageBitmap(filteredBitmap);
+        }
     }
 
 
@@ -189,7 +180,6 @@ public class StillFragment extends Fragment {
     public void onDestroy() {
         // Unregister since the activity is about to be closed.
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mReceiver);
-        mPrefs.unregisterOnSharedPreferenceChangeListener(mPrefsListener);
         super.onDestroy();
     }
 
