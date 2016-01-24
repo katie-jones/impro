@@ -35,13 +35,13 @@ public class StillFragment extends Fragment {
     private Bitmap filteredBitmap; // filtered image
     private Bitmap reducedBitmap; // scaled image
     private ImageView mImageView;
+    private ImageView mImageViewOrig;
     private Button mButtonFilt;
     private Button mButtonOrig;
     private int mQuality;
     private SharedPreferences mPrefs;
 
     boolean viewCreated = false;
-
 
     private final static String PREF_QUALITY_KEY = "p_quality_key";
     private final static String TAG = "StillFragment";
@@ -52,7 +52,13 @@ public class StillFragment extends Fragment {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.stillfragment, container, false);
         mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
+        mImageViewOrig = (ImageView) mView.findViewById(R.id.stillimagevieworig);
+
+
+
         mBitmap = CommonResources.bitmap;
+
+
 
         // Set up button actions for saving images
         mButtonFilt = (Button) mView.findViewById(R.id.button_savefilt);
@@ -86,7 +92,9 @@ public class StillFragment extends Fragment {
                 ViewTreeObserver obs = mImageView.getViewTreeObserver();
                 obs.removeOnGlobalLayoutListener(this);
 
-                imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
+                imageViewTransform(mImageView, filteredBitmap);
+                imageViewTransform(mImageViewOrig, mBitmap);
+                mImageViewOrig.setImageBitmap(mBitmap);
                 viewCreated = true;
 
             }
@@ -109,6 +117,7 @@ public class StillFragment extends Fragment {
 
         else {
             mImageView.setImageBitmap(filteredBitmap);
+            mImageViewOrig.setImageBitmap(mBitmap);
         }
 
 
@@ -121,7 +130,7 @@ public class StillFragment extends Fragment {
         if (newQuality != mQuality && viewCreated) {
             mQuality = newQuality;
             makeReducedAndFilteredBitmaps(newQuality);
-            imageViewTransform(mImageView.getWidth(), mImageView.getHeight());
+            imageViewTransform(mImageView, filteredBitmap);
             startFiltering();
             mImageView.setImageBitmap(filteredBitmap);
         }
@@ -216,14 +225,16 @@ public class StillFragment extends Fragment {
 
 
     // Calculate image transform matrix needed to apply to image view to make it fit within the view
-    private void imageViewTransform(int viewWidth, int viewHeight) {
+    private void imageViewTransform(ImageView imageView, Bitmap image) {
+        int viewWidth = imageView.getWidth();
+        int viewHeight = imageView.getHeight();
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
 
         Matrix matrix = new Matrix(); // transformation matrix
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight); // view rectangle
         RectF bufferRect; // image rectangle
 
-        bufferRect = new RectF(0, 0, filteredBitmap.getWidth(), filteredBitmap.getHeight());
+        bufferRect = new RectF(0, 0, image.getWidth(), image.getHeight());
 
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
@@ -245,7 +256,7 @@ public class StillFragment extends Fragment {
         matrix.preTranslate((centerX - bufferRect.centerX()), (centerY - bufferRect.centerY()));
         matrix.postRotate(90 * (1 - rotation), centerX, centerY);
 
-        mImageView.setImageMatrix(matrix);
+        imageView.setImageMatrix(matrix);
     }
 
 
