@@ -178,15 +178,14 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 
         if (key.equals(CommonResources.PREF_FILTERTYPE_KEY)) {
-//            int type = Integer.parseInt(prefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT));
             CommonResources.FilterType type = CommonResources.getFilterType(prefs);
             mColorbarFragment.setColorbarType(type);
             return;
         }
 
         if (key.contains(CommonResources.PREF_FILTERSETTINGS_KEY_ROOT)) {
-            final int filter_type = Integer.parseInt(prefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT));
-            final int[] filter_settings = CommonResources.getFilterValues(prefs, CommonResources.FilterType.values()[filter_type]);
+            CommonResources.FilterType type = CommonResources.getFilterType(prefs);
+            final int[] filter_settings = CommonResources.getFilterValues(prefs, type);
 
             mColorbarFragment.setValues(filter_settings);
             return;

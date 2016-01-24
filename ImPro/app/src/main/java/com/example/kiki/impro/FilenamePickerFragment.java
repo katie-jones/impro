@@ -120,11 +120,12 @@ public class FilenamePickerFragment extends DialogFragment {
 
             // get image type from preferences
             SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            CommonResources.ImageType imageFormat = CommonResources.ImageType.values()[Integer.parseInt(mPrefs.getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT))];
+            CommonResources.ImageType imageFormat = CommonResources.getImageType(mPrefs);
+//            CommonResources.ImageType imageFormat = CommonResources.ImageType.values()[Integer.parseInt(mPrefs.getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT))];
             Bitmap.CompressFormat compFormat;
             switch (imageFormat)
             {
-                case JPG:
+                case JPEG:
                     mFilename = mFilename + ".jpeg";
                     compFormat = Bitmap.CompressFormat.JPEG;
                     break;

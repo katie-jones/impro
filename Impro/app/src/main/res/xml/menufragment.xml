@@ -36,7 +36,7 @@
         android:dialogTitle="@string/p_imagetype_dialog"
         android:entries="@array/p_imagetype_entries"
         android:entryValues="@array/p_imagetype_values"
-        android:defaultValue="0"
+        android:defaultValue="PNG"
         android:persistent="true"
         />
 

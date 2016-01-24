@@ -2,6 +2,7 @@ package com.example.kiki.impro;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -40,7 +41,7 @@ public class CommonResources {
     public static String file_to_be_opened = "file";
 
     // image types to be saved
-    public enum ImageType{PNG, JPG, WEBP};
+    public enum ImageType{PNG, JPEG, WEBP};
 
     // filter types used
     public enum FilterType{RGB, HSV, CMYK};
@@ -53,7 +54,7 @@ public class CommonResources {
     public static final String PREF_FILTERTYPE_DEFAULT = "RGB";
     public static final String PREF_FILTERSETTINGS_KEY_ROOT = "p_filtersettings_";
     public static final String PREF_IMAGETYPE_KEY = "p_imagetype_key";
-    public static final String PREF_IMAGETYPE_DEFAULT = "0";
+    public static final String PREF_IMAGETYPE_DEFAULT = "PNG";
 
 
     // Method to return the filter values from prefs as an integer array
@@ -79,12 +80,19 @@ public class CommonResources {
     }
 
 
-//    // Method to return the image type from prefs
-//    public static ImageType getImageType(SharedPreferences prefs)
-//    {
-//        String type = prefs.getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT);
-//        return ImageType.valueOf(type);
-//    }
+    // Method to return the image type from prefs
+    public static ImageType getImageType(SharedPreferences prefs)
+    {
+        String type = prefs.getString(PREF_IMAGETYPE_KEY, PREF_IMAGETYPE_DEFAULT);
+        ImageType imageType;
+        try {
+            imageType = ImageType.valueOf(type);
+        }
+        catch (IllegalArgumentException e) {
+            imageType = ImageType.valueOf(PREF_IMAGETYPE_DEFAULT);
+        }
+        return imageType;
+    }
 
     // Method to return the filter type from prefs
     public static FilterType getFilterType(SharedPreferences prefs)

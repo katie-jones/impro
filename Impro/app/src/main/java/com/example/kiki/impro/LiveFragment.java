@@ -296,10 +296,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
      */
     private ImageReader mImageReader;
 
-    /**
-     * This is the output file for our picture.
-     */
-    private File mFile;
 
     /**
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
@@ -463,7 +459,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     public void onViewCreated(final View view, Bundle savedInstanceState) {
 //        Log.e(TAG,"on view created");
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
     }
 
     @Override
@@ -870,8 +865,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-//                    showToast("Saved: " + mFile);
-                    Log.d(TAG, mFile.toString());
 //                    unlockFocus();
                 }
             };

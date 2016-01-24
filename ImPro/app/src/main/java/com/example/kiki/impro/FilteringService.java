@@ -52,7 +52,6 @@ public class FilteringService extends IntentService {
 
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         CommonResources.FilterType type = CommonResources.getFilterType(mPrefs);
-//        int type = Integer.parseInt(mPrefs.getString(CommonResources.PREF_FILTERTYPE_KEY, CommonResources.PREF_FILTERTYPE_DEFAULT));
 
         Mat mMat = new Mat(height,width, CvType.CV_8UC4,new Scalar(0));
         Mat mOrigMat = new Mat(height,width, CvType.CV_8UC4,new Scalar(0));
