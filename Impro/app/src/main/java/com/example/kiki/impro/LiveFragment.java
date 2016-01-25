@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -60,15 +59,14 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created by kiki on 10.11.15.
+ *
+ * Shows live camera view.
  */
 public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPermissionsResultCallback {
-    private View mView; // View corresponding to fragment -- inflated xml file
+    private View mView;
     private Button mButton;
     private final static String TAG = "livefragment";
-    static private String TAG_LIVE_FRAGMENT="LiveFragment";
     static private String TAG_FILE_OPENER="FileOpener";
-
-    private final int mImageWidth = 600;
 
     private LiveFragmentInterface mInterface;
 
@@ -79,7 +77,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         myOnAttach(getActivity());
 
     }
@@ -90,8 +87,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
         setRetainInstance(true);
     }
 
-
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -100,25 +95,12 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     }
 
     public void load_image() {
+        // Open dialog to choose image to load
         Log.e(TAG, "opening");
-//        FragmentTransaction ft = getFragmentManager().beginTransaction();
-//        Fragment prev = getFragmentManager().findFragmentByTag("FilenameFragment");
-//        if (prev != null) {
-//            ft.remove(prev);
-//        }
-//        ft.addToBackStack(null);
 
-        // Create and show the dialog.
-        // TODO: Do this via interface?
         FileOpenerFragment dialogFragment = FileOpenerFragment.newInstance();
         dialogFragment.setRetainInstance(true);
         dialogFragment.show(getFragmentManager(), TAG_FILE_OPENER);
-
-
-//        FileOpenerList mFileOpener = new FileOpenerList();
-//        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//        transaction.replace(this.getId(), mFileOpener, TAG_FILE_OPENER);
-//        transaction.commit();
     }
 
 
@@ -151,7 +133,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
     }
 
     /**
-     * Conversion from screen rotation to JPEG orientation.
+     *  Conversion from screen rotation to JPEG orientation.
      */
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
@@ -204,11 +186,7 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
-//            Log.e(TAG,"Surface texture size changed");
-//            Log.e(TAG,String.valueOf(height));
-//            Log.e(TAG,String.valueOf(width));
             texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-
             configureTransform(width, height);
         }
 
@@ -295,7 +273,6 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
      * An {@link ImageReader} that handles still image capture.
      */
     private ImageReader mImageReader;
-
 
     /**
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
@@ -553,32 +530,16 @@ public class LiveFragment extends Fragment implements FragmentCompat.OnRequestPe
 
                 Log.e(TAG,"New size:"+String.valueOf(largest.getWidth())+" x "+String.valueOf(largest.getHeight()));
                 Size imageSize = largest;
-//                Size[] ourSizes = map.getOutputSizes(ImageFormat.JPEG);
-//                Size imageSize = ourSizes[0];
-//                int diff = mImageWidth+1;
-//                for (int i=0; i<ourSizes.length; i++) {
-//                    int dwidth = Math.abs(ourSizes[i].getWidth() - mImageWidth);
-//                    if (dwidth < diff) {
-//                        imageSize = ourSizes[i];
-//                        diff = dwidth;
-//                    }
-//                }
 
                 mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, mBackgroundHandler);
-//                Log.e(TAG, String.valueOf(imageSize.getWidth()));
-//                Log.e(TAG,String.valueOf(imageSize.getHeight()));
                 // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
                 // garbage capture data.
-//                mPreviewSize = imageSize;
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                         width, height, imageSize);
-
-//                Log.e(TAG, String.valueOf(mPreviewSize.getWidth()));
-//                Log.e(TAG,String.valueOf(mPreviewSize.getHeight()));
 
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = getResources().getConfiguration().orientation;

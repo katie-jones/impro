@@ -31,6 +31,8 @@ import xdroid.toaster.Toaster;
 
 /**
  * Created by kiki on 2016-01-15.
+ *
+ * Fragment for manually entering filename
  */
 public class FilenamePickerFragment extends DialogFragment {
     String mFilename;
@@ -40,15 +42,8 @@ public class FilenamePickerFragment extends DialogFragment {
     Button mButton_Ok;
     Button mButton_Cancel;
     static private String TAG="FilenameFragment";
-    static String DEFAULT_VALUE = "image";
-
-    private static final String PREF_IMAGETYPE_DEFAULT = "0";
-    private static final String PREF_IMAGETYPE_KEY = "p_imagetype_key";
 
     ImproDbAdapter mDbAdapter;
-
-
-
 
     static FilenamePickerFragment newInstance(String type) {
         FilenamePickerFragment f = new FilenamePickerFragment();

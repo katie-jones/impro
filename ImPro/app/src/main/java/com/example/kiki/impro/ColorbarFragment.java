@@ -1,30 +1,16 @@
 package com.example.kiki.impro;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.florescu.android.rangeseekbar.RangeSeekBar;
-import org.opencv.android.Utils;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Range;
-import org.opencv.core.Scalar;
-
-import java.util.Set;
-
-import xdroid.toaster.Toaster;
 
 
 /**
@@ -57,10 +43,9 @@ public class ColorbarFragment extends Fragment {
         mText3 = (TextView) mView.findViewById(R.id.colortext3);
         mText4 = (TextView) mView.findViewById(R.id.colortext4);
 
+        // set current values in all colorbars
         int[] filter_settings = CommonResources.getFilterValues(mPrefs, filter_type);
-
         setValues(filter_settings);
-
         setColorbarType(filter_type);
 
 
@@ -99,8 +84,6 @@ public class ColorbarFragment extends Fragment {
                 }
             }
         };
-
-
 
         mSeekBar1.setOnRangeSeekBarChangeListener(listener);
         mSeekBar2.setOnRangeSeekBarChangeListener(listener);
@@ -150,6 +133,7 @@ public class ColorbarFragment extends Fragment {
     }
 
 
+    // change cursor to the current values
     public void setValues(int[] settings)
     {
         mSeekBar1.setSelectedMinValue(settings[0]);

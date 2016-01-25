@@ -15,6 +15,8 @@ import java.util.List;
  *
  * from
  * http://www.dreamincode.net/forums/topic/190013-creating-simple-file-chooser/
+ *
+ * Adapter for creating list of files in Picture folder
  */
 public class FileArrayAdapter extends ArrayAdapter<Option> {
     static private String TAG = "FileArrayAdapter";
@@ -49,9 +51,6 @@ public class FileArrayAdapter extends ArrayAdapter<Option> {
             TextView t1 = (TextView) v.findViewById(R.id.TextView01);
             TextView t2 = (TextView) v.findViewById(R.id.TextView02);
 
-
-                //t1.setBackgroundColor(0xA0FF8000);
-                //t2.setBackgroundColor(0xA0FF8000);
             if(t1!=null)
                 t1.setText(o.getName());
 

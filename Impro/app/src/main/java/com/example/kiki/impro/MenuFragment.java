@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 /**
  * Created by kiki on 10.11.15.
+ *
+ * Menu fragment with Filtering scheme, Quality and Image format settings.
  */
 
 public class MenuFragment extends PreferenceFragment {
@@ -21,18 +23,5 @@ public class MenuFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.menufragment);
-
-////        SharedPreferences prefs = PreferenceManager
-//                .getDefaultSharedPreferences(getActivity());
-//        prefs.registerOnSharedPreferenceChangeListener(getActivity());
-
-
     }
-
-
-//    @Override
-//    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-//        Log.e(TAG, "Save");
-//        super.onSaveInstanceState(savedInstanceState);
-//    }
 }

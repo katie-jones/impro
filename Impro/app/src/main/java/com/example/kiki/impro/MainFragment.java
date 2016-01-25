@@ -14,17 +14,18 @@ import android.widget.Button;
 
 /**
  * Created by kiki on 10.11.15.
+ *
+ * Fragment that contains Live and Still fragment.
  */
 public class MainFragment extends Fragment implements View.OnClickListener {
     private final static String TAG = "MainFrag";
 
-    private View mView; // View corresponding to fragment -- inflated xml file
-
+    private View mView;
     private MainInterface mMainInterface;
 
     public interface MainInterface {
-        public void onButtonClicked(View v);
-        public void onFragmentCreated(Bundle savedInstanceState);
+        void onButtonClicked(View v);
+        void onFragmentCreated(Bundle savedInstanceState);
     }
 
     @Override
@@ -40,8 +41,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMainInterface.onFragmentCreated(savedInstanceState);
-
-
     }
 
 
@@ -58,7 +57,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         myOnAttach(getActivity());
 
     }
-
 
     @Override
     public void onAttach(Activity activity) {

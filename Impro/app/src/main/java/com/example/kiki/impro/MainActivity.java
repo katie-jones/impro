@@ -2,7 +2,6 @@ package com.example.kiki.impro;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -40,13 +39,8 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     };
 
 
-    /**
-     * Checks if the app has permission to write to device storage
-     *
-     * If the app does not has permission then the user will be prompted to grant permissions
-     *
-     * @param activity
-     */
+    //Checks if the app has permission to write to device storage
+    //If the app does not has permission then the user will be prompted to grant permissions
     public static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -71,8 +65,6 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             );
         }
     }
-
-
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -113,17 +105,18 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
 
         mColorbarFragment = (ColorbarFragment) getFragmentManager().findFragmentById(R.id.colorbarfragment);
 
+        // listener for the preference menu
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
+        // verify that all permissions defined in manifest are actually
         verifyStoragePermissions(this);
     }
 
+    // Change fragment when button is clicked.
     public void onButtonClicked(View v) {
-        // Exchange current fragment with the other one.
         if (mLiveFragment.isVisible()){
-//            LiveFragment frag = (LiveFragment) getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
-//            frag.takePicture();
+            // change to still fragment
             stillActive=false;
             LiveFragment frag = (LiveFragment) mLiveFragment;
             // take picture in live fragment, when its done, the fragment will change to
@@ -131,6 +124,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
             frag.takePicture();
         }
         else  {
+            // change to live fragment
             mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.replace(mStillFragment.getId(), mLiveFragment, TAG_LIVE_FRAGMENT);
@@ -140,7 +134,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
     }
 
 
-    // interface method from live fragment: initializes both fragments
+    // Interface method from live fragment: initializes both fragments
     public void onFragmentCreated(Bundle savedInstanceState) {
         mLiveFragment = (LiveFragment) getFragmentManager().findFragmentByTag(TAG_LIVE_FRAGMENT);
         mStillFragment = (StillFragment) getFragmentManager().findFragmentByTag(TAG_STILL_FRAGMENT);
@@ -149,19 +143,12 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         if (mStillFragment==null)
             mStillFragment = new StillFragment();
 
+        // show livefragment as first fragment
         if (savedInstanceState==null) {
-
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            //transaction.replace(R.id.cameraview, mStillFragment);
             transaction.replace(R.id.cameraview, mLiveFragment, TAG_LIVE_FRAGMENT);
             stillActive=false;
             transaction.commit();
-        }
-        else {
-            if (stillActive) {
-                StillFragment frag = (StillFragment) mStillFragment;
-//                frag.onRotated();
-            }
         }
     }
 
@@ -173,7 +160,7 @@ public class MainActivity extends Activity implements MainFragment.MainInterface
         transaction.commit();
     }
 
-    // method for menu fragment
+    // Update CommonResources with new preference values
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 
