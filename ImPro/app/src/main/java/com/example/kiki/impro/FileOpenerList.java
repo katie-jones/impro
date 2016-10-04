@@ -26,6 +26,9 @@ import java.util.List;
  *
  * from
  * http://www.dreamincode.net/forums/topic/190013-creating-simple-file-chooser/
+ *
+ * Listfragment shown in fileopener fragment for dynamically showing all files currently
+ * saved in folder
  */
 public class FileOpenerList extends ListFragment {
     static private String TAG="FileOpener";

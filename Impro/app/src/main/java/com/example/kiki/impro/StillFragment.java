@@ -28,6 +28,8 @@ import org.opencv.core.Mat;
 
 /**
  * Created by kiki on 10.11.15.
+ *
+ * Show original and filtered image.
  */
 public class StillFragment extends Fragment {
     private View mView; // View corresponding to fragment -- inflated xml file
@@ -54,11 +56,7 @@ public class StillFragment extends Fragment {
         mImageView = (ImageView) mView.findViewById(R.id.stillimageview);
         mImageViewOrig = (ImageView) mView.findViewById(R.id.stillimagevieworig);
 
-
-
         mBitmap = CommonResources.bitmap;
-
-
 
         // Set up button actions for saving images
         mButtonFilt = (Button) mView.findViewById(R.id.button_savefilt);
@@ -88,7 +86,6 @@ public class StillFragment extends Fragment {
 
             @Override
             public void onGlobalLayout() {
-//                    Log.e(TAG, "Image view size: " + String.valueOf(mImageView.getWidth()) + " x " + String.valueOf(mImageView.getHeight()));
                 ViewTreeObserver obs = mImageView.getViewTreeObserver();
                 obs.removeOnGlobalLayoutListener(this);
 
@@ -110,17 +107,13 @@ public class StillFragment extends Fragment {
             // initialize filtered image and then apply filter
             mQuality = mPrefs.getInt(PREF_QUALITY_KEY, CommonResources.PREF_QUALITY_DEFAULT);
             makeReducedAndFilteredBitmaps(mQuality);
-
             startFiltering();
-
         }
 
         else {
             mImageView.setImageBitmap(filteredBitmap);
             mImageViewOrig.setImageBitmap(mBitmap);
         }
-
-
         return mView;
     }
 
@@ -136,7 +129,7 @@ public class StillFragment extends Fragment {
         }
     }
 
-
+    // Create bitmaps and reduce size according quality set.
     private void makeReducedAndFilteredBitmaps(int quality)
     {
         reducedBitmap = Bitmap.createScaledBitmap(mBitmap, (quality * mBitmap.getWidth()) / 100, (quality * mBitmap.getHeight()) / 100, true);
@@ -145,17 +138,14 @@ public class StillFragment extends Fragment {
         CommonResources.filteredBitmap = filteredBitmap;
     }
 
-
+    // Create new intent to filter image
     private void startFiltering()
     {
-        // Create new intent to filter image
         CommonResources.filtering_toast = Toast.makeText(getActivity(), "filtering...", Toast.LENGTH_LONG);
         CommonResources.filtering_toast.show();
         Intent mServiceIntent = new Intent(getActivity(), FilteringService.class);
         getActivity().startService(mServiceIntent);
     }
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -166,8 +156,6 @@ public class StillFragment extends Fragment {
         IntentFilter mStatusIntentFilter = new IntentFilter(
                 CommonResources.BROADCAST_ACTION);
 
-
-
         // Registers the FilteringBroadcastReceiver and its intent filters
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mReceiver,
@@ -176,6 +164,7 @@ public class StillFragment extends Fragment {
         viewCreated = false;
     }
 
+    // Open dialog to save file under chosen name
     public void save_image(String type) {
         Log.e(TAG, "save_image:" + type);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -183,7 +172,6 @@ public class StillFragment extends Fragment {
         if (prev != null) {
             ft.remove(prev);
         }
-        ft.addToBackStack(null);
 
         // Create and show the dialog.
         DialogFragment newFragment = FilenamePickerFragment.newInstance(type);

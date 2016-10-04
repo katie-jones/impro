@@ -15,6 +15,8 @@ import java.util.prefs.Preferences;
 
 /**
  * Created by katie on 2015-12-07.
+ *
+ * Fragment to choose quality
  */
 public class NumberPickerPreference extends DialogPreference {
     int mQualityValue;

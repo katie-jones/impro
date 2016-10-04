@@ -18,6 +18,8 @@ import org.opencv.imgproc.Imgproc;
 
 /**
  * Created by katie on 2015-12-28.
+ *
+ * Filtering intentservice for filtering image in the background
  */
 
 public class FilteringService extends IntentService {
@@ -137,8 +139,6 @@ public class FilteringService extends IntentService {
 
         Utils.matToBitmap(mMat, CommonResources.filteredBitmap);
     }
-
-
 
     // Convert RGB Mat mMat to CMYK Mat newMat
     private void cvt2CMYK(Mat mMat, Mat newMat) {

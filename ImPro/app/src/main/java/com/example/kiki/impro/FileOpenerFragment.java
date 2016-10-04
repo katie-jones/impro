@@ -33,6 +33,8 @@ import xdroid.toaster.Toaster;
 
 /**
  * Created by kiki on 2016-01-15.
+ *
+ * Fragment for opening file from external storage
  */
 public class FileOpenerFragment extends DialogFragment {
     Button mButton_Ok;
@@ -83,7 +85,6 @@ public class FileOpenerFragment extends DialogFragment {
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.replace(R.id.fileopenerlist, fragment, TAG_FILE_FRAGMENT);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        //ft.addToBackStack(null);
         ft.commit();
 
 
@@ -100,8 +101,6 @@ public class FileOpenerFragment extends DialogFragment {
         mButton_Cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // TODO: change to still fragment
                 getDialog().dismiss();
             }
         });
@@ -120,7 +119,7 @@ public class FileOpenerFragment extends DialogFragment {
         // Save in common resources
         CommonResources.bitmap = bitmap;
 
-        //TODO: change to still fragment
+        // change to still fragment
         mInterface.toStillFragment();
 
         getDialog().dismiss();
